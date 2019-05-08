@@ -1,5 +1,57 @@
 ﻿@page "/"
+@inject GameClient GameClient
 
-<h1>Hello, world!</h1>
+<h1>Rochambot!</h1>
 
-Welcome to your new app.
+<div class="w-25">
+    <img src="/images/rps.png" class="img-fluid img-thumbnail rounded" />
+</div>
+
+<p>GameId: @GameClient.GameId</p>
+<p>Status: @status</p>
+<p>BotShape: @botShape</p>
+<p>PlayerShape: @playerShape</p>
+
+<div id="game">
+    <button type="button" class="btn btn-primary btn-lg" onclick="@Rock">
+        <i class="fas fa-hand-rock"></i>
+    </button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="@Paper">
+        <i class="fas fa-hand-paper"></i>
+    </button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="@Scissors">
+        <i class="fas fa-hand-scissors"></i>
+    </button>
+</div>
+
+@functions {
+
+    Shape botShape;
+    Shape playerShape;
+    string status;
+
+    async Task Rock()
+    {
+        await Play(Shape.Rock);
+    }
+
+    async Task Paper()
+    {
+        await Play(Shape.Paper);
+    }
+
+    async Task Scissors()
+    {
+        await Play(Shape.Scissors);
+    }
+
+    async Task Play(Shape player)
+    {
+        status = "Waiting for bot...";
+        await GameClient.RequestShape((Shape shape) => {
+            botShape = shape;
+            status = "Done.";
+        });
+        playerShape = player;
+    }
+}
