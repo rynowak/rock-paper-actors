@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rochambot", "Rochambot\Rochambot.csproj", "{D56134AC-F87E-4C34-BB55-7AAD52CC294D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rochambot", "src\Rochambot\Rochambot.csproj", "{D56134AC-F87E-4C34-BB55-7AAD52CC294D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobbyBot", "RobbyBot\RobbyBot.csproj", "{EBAD037F-21CE-459B-BE8A-A81F1EB77702}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobbyBot", "src\RobbyBot\RobbyBot.csproj", "{EBAD037F-21CE-459B-BE8A-A81F1EB77702}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C96B17F5-6CBC-4C0E-999D-54731181F841}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker", "src\MatchMaker\MatchMaker.csproj", "{61287F97-301A-4500-A18C-02D32C2A9279}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,5 +48,20 @@ Global
 		{EBAD037F-21CE-459B-BE8A-A81F1EB77702}.Release|x64.Build.0 = Release|Any CPU
 		{EBAD037F-21CE-459B-BE8A-A81F1EB77702}.Release|x86.ActiveCfg = Release|Any CPU
 		{EBAD037F-21CE-459B-BE8A-A81F1EB77702}.Release|x86.Build.0 = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|x64.Build.0 = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Debug|x86.Build.0 = Debug|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x64.ActiveCfg = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x64.Build.0 = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x86.ActiveCfg = Release|Any CPU
+		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{61287F97-301A-4500-A18C-02D32C2A9279} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 	EndGlobalSection
 EndGlobal
