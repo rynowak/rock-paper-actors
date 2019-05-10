@@ -19,7 +19,7 @@ namespace Rochambot
 
         public string Id { get; private set; }
 
-        public Oponent Oponent { get; private set; }
+        public Opponent Opponent { get; private set; }
 
         public GameClient(IConfiguration configuration)
         {
@@ -30,13 +30,13 @@ namespace Rochambot
             Id = Guid.NewGuid().ToString();
         }
 
-        public async Task<Shape> RequestShape()
+        public async Task<Shape> SelectShape()
         {
             await StartSession();
 
             var requestMessage = new Message
             {
-                SessionId = Oponent.Id,
+                SessionId = Opponent.Id,
                 ReplyToSessionId = Id
             };
 
@@ -62,7 +62,7 @@ namespace Rochambot
             await _gameRequest.SendAsync(gameRequestMessage);
 
             var gameData = await _session.ReceiveAsync();
-            Oponent = new Oponent(gameData.ReplyToSessionId);
+            Opponent = new Opponent(gameData.ReplyToSessionId);
             await _session.CompleteAsync(gameData.SystemProperties.LockToken);
         }
 

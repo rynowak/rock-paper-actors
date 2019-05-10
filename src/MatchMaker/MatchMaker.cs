@@ -47,7 +47,7 @@ namespace MatchMaker
                 if(messages.Count() == 1)
                 {
                     var playerOne = messages[0];
-                    _logger.LogTrace("1 message recieved, asking for bot to play against {oponent}", playerOne.ReplyToSessionId);
+                    _logger.LogTrace("1 message receiver, asking for bot to play against {opponent}", playerOne.ReplyToSessionId);
 
                     var botRequestMessage = new Message
                     {
