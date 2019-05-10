@@ -32,17 +32,17 @@ namespace RobbyBot
             _botRequestQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotRequestQueueName"]);
             _botResponseQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotResponseQueueName"]);
 
-            _botRequestQueue.RegisterMessageHandler(RecievedGameRequest, RecievedGameRequestError);
+            _botRequestQueue.RegisterMessageHandler(ReceivedGameRequest, ReceivedGameRequestError);
             return Task.CompletedTask;
         }
 
-        private Task RecievedGameRequestError(ExceptionReceivedEventArgs arg)
+        private Task ReceivedGameRequestError(ExceptionReceivedEventArgs arg)
         {
-            _logger.LogError(arg.Exception, "Error recieving game request");
+            _logger.LogError(arg.Exception, "Error receiving game request");
             return Task.CompletedTask;
         }
 
-        private async Task RecievedGameRequest(Message message, CancellationToken arg2)
+        private async Task ReceivedGameRequest(Message message, CancellationToken arg2)
         {
             var gameRequest = new Message
             {

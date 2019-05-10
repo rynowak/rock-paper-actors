@@ -60,7 +60,7 @@ namespace RobbyBot
                 
                 Random rand = new Random();
 
-                _logger.LogInformation("Message Recieved {message}", message);
+                _logger.LogInformation("Message Received {message}", message);
                 var respMessage = new Message(UTF8Encoding.UTF8.GetBytes(Shapes[rand.Next(0,2)]));
                 respMessage.SessionId = message.ReplyToSessionId;
 
