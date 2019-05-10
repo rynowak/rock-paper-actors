@@ -1,0 +1,15 @@
+group=bradyg-rochambot
+namespace=bradyg-rochambot
+
+echo 'Creating the service bus instance'
+# todo
+
+echo 'Creating the queues'
+az servicebus queue create --namespace-name $namespace --resource-group $group --name botrequestqueue --enable-session false
+az servicebus queue create --namespace-name $namespace --resource-group $group --name botresponsequeue --enable-session true
+az servicebus queue create --namespace-name $namespace --resource-group $group --name matchrequestqueue --enable-session false
+az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperequestqueue --enable-session true
+az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperesponsequeue --enable-session true
+
+echo 'List of new queues'
+az servicebus queue list --namespace-name $namespace -g $group --query '[].{Name:name,Sessions:requiresSession}' -o table 
