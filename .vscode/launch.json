@@ -9,11 +9,23 @@
             "configurations": [
                 "WebClient",
                 "RobbyBot",
-                "MatchMaker"
+                "MatchMaker",
+                "GameMaster"
             ]
         }
     ],
     "configurations": [
+        {
+            "name": "GameMaster",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/GameMaster/bin/Debug/netcoreapp3.0/GameMaster.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/GameMaster",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
         {
             "name": "MatchMaker",
             "type": "coreclr",
