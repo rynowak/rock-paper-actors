@@ -42,7 +42,7 @@ else
         playerShape = playerPick;
         status = "Waiting for bot...";
         disabled = true;
-        botShape = await GameClient.RequestShape();
+        botShape = await GameClient.SelectShape();
         disabled = false;
         status = "Done.";
     }

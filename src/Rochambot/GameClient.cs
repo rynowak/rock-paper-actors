@@ -30,7 +30,7 @@ namespace Rochambot
             Id = Guid.NewGuid().ToString();
         }
 
-        public async Task<Shape> RequestShape()
+        public async Task<Shape> SelectShape()
         {
             await StartSession();
 
