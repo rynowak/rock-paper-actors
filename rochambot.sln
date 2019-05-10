@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rochambot", "src\Rochambot\Rochambot.csproj", "{D56134AC-F87E-4C34-BB55-7AAD52CC294D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rochambot", "src\Rochambot\Rochambot.csproj", "{D56134AC-F87E-4C34-BB55-7AAD52CC294D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobbyBot", "src\RobbyBot\RobbyBot.csproj", "{EBAD037F-21CE-459B-BE8A-A81F1EB77702}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobbyBot", "src\RobbyBot\RobbyBot.csproj", "{EBAD037F-21CE-459B-BE8A-A81F1EB77702}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C96B17F5-6CBC-4C0E-999D-54731181F841}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker", "src\MatchMaker\MatchMaker.csproj", "{61287F97-301A-4500-A18C-02D32C2A9279}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchMaker", "src\MatchMaker\MatchMaker.csproj", "{61287F97-301A-4500-A18C-02D32C2A9279}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D56134AC-F87E-4C34-BB55-7AAD52CC294D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -61,7 +58,15 @@ Global
 		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x86.ActiveCfg = Release|Any CPU
 		{61287F97-301A-4500-A18C-02D32C2A9279}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{D56134AC-F87E-4C34-BB55-7AAD52CC294D} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
+		{EBAD037F-21CE-459B-BE8A-A81F1EB77702} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 		{61287F97-301A-4500-A18C-02D32C2A9279} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9359A577-3D5C-40AF-AEE0-5341FBF0A194}
 	EndGlobalSection
 EndGlobal

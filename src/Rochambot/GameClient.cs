@@ -10,11 +10,11 @@ namespace Rochambot
 {
     public class GameClient : IAsyncDisposable
     {
+        readonly IConfiguration _configuration;
+        readonly IQueueClient _requestClient;
+        readonly ISessionClient _responseClient;
+        readonly IQueueClient _gameRequest;
 
-        IConfiguration _configuration;
-        IQueueClient _requestClient;
-        ISessionClient _responseClient;
-        IQueueClient _gameRequest;
         IMessageSession _session;
 
         public string Id { get; private set; }
@@ -26,7 +26,7 @@ namespace Rochambot
             _configuration = configuration;
             _requestClient = new QueueClient(_configuration["ConnectionString"], _configuration["RequestQueueName"]);
             _responseClient = new SessionClient(_configuration["ConnectionString"], _configuration["ResponseQueueName"]);
-            _gameRequest = new QueueClient(_configuration["ConfigurationString"], _configuration["GameQueueName"]);
+            _gameRequest = new QueueClient(_configuration["ConnectionString"], _configuration["GameQueueName"]);
             Id = Guid.NewGuid().ToString();
         }
 
@@ -34,8 +34,11 @@ namespace Rochambot
         {
             await StartSession();
 
-            var requestMessage = new Message();
-            requestMessage.ReplyToSessionId = Id;
+            var requestMessage = new Message
+            {
+                SessionId = Oponent.Id,
+                ReplyToSessionId = Id
+            };
 
             await _requestClient.SendAsync(requestMessage);
             var message = await _session.ReceiveAsync();
@@ -51,13 +54,16 @@ namespace Rochambot
         {
             await StartSession();
 
-            var gameRequestMessage = new Message();
-            gameRequestMessage.ReplyToSessionId = Id;
+            var gameRequestMessage = new Message
+            {
+                ReplyToSessionId = Id
+            };
 
             await _gameRequest.SendAsync(gameRequestMessage);
 
             var gameData = await _session.ReceiveAsync();
-            Oponent = JsonSerializer.Parse<Oponent>(gameData.Body);
+            Oponent = new Oponent(gameData.ReplyToSessionId);
+            await _session.CompleteAsync(gameData.SystemProperties.LockToken);
         }
 
         public async Task StartSession()

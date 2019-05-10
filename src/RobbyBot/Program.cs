@@ -18,7 +18,8 @@ namespace RobbyBot
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
                 {
-                    services.AddHostedService<Worker>();
+                    services.AddHostedService<GameRequestHandler>();
+                    services.AddHostedService<ShapeHandler>();
                 });
     }
 }
