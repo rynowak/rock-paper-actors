@@ -2,9 +2,9 @@ using System;
 
 namespace Rochambot
 {
-    public class Oponent
+    public class Opponent
     {
-        public Oponent(string id)
+        public Opponent(string id)
         {
             Id = id;
         }

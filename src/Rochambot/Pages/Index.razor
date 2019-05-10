@@ -7,9 +7,9 @@
 <p>Status: @status</p>
 <p>BotShape: @botShape</p>
 <p>PlayerShape: @playerShape</p>
-<p>Oponent: @GameClient.Oponent?.Id</p>
+<p>Opponent: @GameClient.Opponent?.Id</p>
 
-@if(GameClient.Oponent == null)
+@if(GameClient.Opponent == null)
 {
     <div id="RequestGame">
         <button type="button" class="btn btn-primary btn-lg" onclick="@RequestGame">Request Game</button>
