@@ -11,6 +11,7 @@ az servicebus queue create --namespace-name $namespace --resource-group $group -
 az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperequestqueue --enable-session true
 az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperesponsequeue --enable-session true
 az servicebus queue create --namespace-name $namespace --resource-group $group --name playershapeselectedqueue --enable-session true
+az servicebus queue create --namespace-name $namespace --resource-group $group --name sessionresults --enable-session true
 
 echo 'List of new queues'
 az servicebus queue list --namespace-name $namespace -g $group --query '[].{Name:name,Sessions:requiresSession}' -o table 

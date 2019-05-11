@@ -18,7 +18,7 @@ namespace GameMaster
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
                 {
-                    services.AddHostedService<Worker>();
+                    services.AddHostedService<GameMaster>();
                 });
     }
 }

@@ -34,17 +34,24 @@ else
 
     Shape botShape;
     Shape playerShape;
+    SessionResult sessionResult;
     string status;
     bool disabled = false;
+
+    protected override async Task OnInitAsync()
+    {
+        await RequestGame();
+    }
 
     async Task Play(Shape playerPick)
     {
         playerShape = playerPick;
         status = "Waiting for bot...";
         disabled = true;
-        botShape = await GameClient.SelectShape();
+        botShape = await GameClient.RequestShape(playerPick);
+        sessionResult = await GameClient.SendShapesToGameMaster(playerShape, botShape);
         disabled = false;
-        status = "Done.";
+        status = sessionResult.Summary;
     }
 
     async Task RequestGame()
