@@ -40,37 +40,28 @@ namespace MatchMaker
             {
                 //TODO: Probably should accept a larger even number and loop through in twos
                 //matching the remainder with a bot.
-                var messages = await _gameQueue.ReceiveAsync(2, TimeSpan.FromSeconds(10));
+                var messages = await _gameQueue.ReceiveAsync(1, TimeSpan.FromSeconds(10));
 
                 if(messages == null) { continue; }
 
-                if(messages.Count() == 1)
-                {
-                    var playerOne = messages[0];
-                    _logger.LogTrace("1 message receiver, asking for bot to play against {opponent}", playerOne.ReplyToSessionId);
+                var playerOne = messages[0];
+                _logger.LogTrace("1 message receiver, asking for bot to play against {opponent}", playerOne.ReplyToSessionId);
 
-                    var botRequestMessage = new Message
-                    {
-                        ReplyToSessionId = _id
-                    };
-
-                    await _botRequestQueue.SendAsync(botRequestMessage);
-                    var bot = await session.ReceiveAsync();
-                    var playerMatchResponse = new Message
-                    {
-                        SessionId = playerOne.ReplyToSessionId,
-                        ReplyToSessionId = bot.ReplyToSessionId
-                    };
-                    await _responseQueue.SendAsync(playerMatchResponse);
-                    await _gameQueue.CompleteAsync(playerOne.SystemProperties.LockToken);
-                    await session.CompleteAsync(bot.SystemProperties.LockToken);
-                }
-                else
+                var botRequestMessage = new Message
                 {
-                    //We have two messages on the queue at the same
-                    //time waiting for a game so match them up.
-                    await MakeMatch(messages[0], messages[1]);
-                }
+                    ReplyToSessionId = _id
+                };
+
+                await _botRequestQueue.SendAsync(botRequestMessage);
+                var bot = await session.ReceiveAsync();
+                var playerMatchResponse = new Message
+                {
+                    SessionId = playerOne.ReplyToSessionId,
+                    ReplyToSessionId = bot.ReplyToSessionId
+                };
+                await _responseQueue.SendAsync(playerMatchResponse);
+                await _gameQueue.CompleteAsync(playerOne.SystemProperties.LockToken);
+                await session.CompleteAsync(bot.SystemProperties.LockToken);
             }
             await session.CloseAsync();
         }
