@@ -1,24 +1,31 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Rochambot;
+using System;
 using System.Text;
-using Microsoft.Azure.ServiceBus.Core;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RobbyBot
 {
     public class ShapeHandler : BackgroundService
     {
-        private readonly ILogger<ShapeHandler> _logger;
-        private ISessionClient _requestQueue;
-        private IQueueClient _responseQueue;
-        private IConfiguration _configuration;
-        private readonly string _botId;
+        static readonly Random Random = new Random((int)DateTime.Now.Ticks);
+        static readonly string[] Shapes = new string[] 
+        {
+            nameof(Shape.Rock),
+            nameof(Shape.Paper),
+            nameof(Shape.Scissors)
+        };
+
+        readonly ILogger<ShapeHandler> _logger;
+        readonly IConfiguration _configuration;
+        readonly string _botId;
+
+        ISessionClient _requestQueue;
+        IQueueClient _responseQueue;
 
         public ShapeHandler(ILogger<ShapeHandler> logger, IConfiguration configuration)
         {
@@ -39,32 +46,29 @@ namespace RobbyBot
         {
             await _requestQueue.CloseAsync();
             await _responseQueue.CloseAsync();
+
             await base.StopAsync(token);
         }
-
-        string[] Shapes = new string[] {
-            "Rock",
-            "Paper",
-            "Scissors"
-        };
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var session = await _requestQueue.AcceptMessageSessionAsync(_botId);
-
-            while(!stoppingToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var message = await session.ReceiveAsync();
-                
-                if(message == null) { continue; }
-                
-                Random rand = new Random();
+                if (message is null)
+                {
+                    continue;
+                }
 
-                _logger.LogInformation("Message Received {message}", message);
-                var respMessage = new Message(UTF8Encoding.UTF8.GetBytes(Shapes[rand.Next(0,2)]));
-                respMessage.SessionId = message.ReplyToSessionId;
+                _logger.LogInformation($"Message Received {message}");
 
-                await _responseQueue.SendAsync(respMessage);
+                var responseMessage = new Message(Encoding.UTF8.GetBytes(Shapes[Random.Next(0, 2)]))
+                {
+                    SessionId = message.ReplyToSessionId
+                };
+
+                await _responseQueue.SendAsync(responseMessage);
                 await session.CompleteAsync(message.SystemProperties.LockToken);
             }
 
