@@ -1,0 +1,76 @@
+﻿@page "/"
+@inject GameClient GameClient
+
+<h1>Rochambot!</h1>
+
+<p>GameId: @GameClient.Id</p>
+<p>Status: @status</p>
+<p>BotShape: @botShape</p>
+<p>PlayerShape: @playerShape</p>
+<p>Opponent: @GameClient.Opponent?.Id</p>
+
+@if(GameClient.Opponent == null)
+{
+    <div id="RequestGame">
+        <button type="button" class="btn btn-primary btn-lg" onclick="@RequestGame">Request Game</button>
+    </div>
+}
+else
+{
+    <div class="card-group">
+        <div class="card text-center">
+            <img class="card-img-top" src='@string.Format($"/images/rock-{winLossStatus}.png")' alt="Rock">
+        </div>
+        <div class="card text-center">
+            <img class="card-img-top" src='@string.Format($"/images/paper-{winLossStatus}.png")' alt="Paper">
+        </div>
+        <div class="card text-center">
+            <img class="card-img-top" src='@string.Format($"/images/scissors-{winLossStatus}.png")' alt="Scissors">
+        </div>
+    </div>
+
+    <div id="game">
+        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Rock))">
+            <i class="fas fa-hand-rock"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Paper))">
+            <i class="fas fa-hand-paper"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Scissors))">
+            <i class="fas fa-hand-scissors"></i>
+        </button>
+    </div>
+}
+
+@functions {
+
+    Shape botShape;
+    Shape playerShape;
+    SessionResult sessionResult;
+    string status;
+    bool disabled = false;
+    string winLossStatus = "normal";
+
+    protected override async Task OnInitAsync()
+    {
+        //await RequestGame();
+    }
+
+    async Task Play(Shape playerPick)
+    {
+        playerShape = playerPick;
+        status = "Waiting for bot...";
+        disabled = true;
+        botShape = await GameClient.RequestShape(playerPick);
+        sessionResult = await GameClient.SendShapesToGameMaster(playerShape, botShape);
+        disabled = false;
+        status = sessionResult.Summary;
+    }
+
+    async Task RequestGame()
+    {
+        status = "Requesting game...";
+        await GameClient.RequestGame();
+        status = "Game found.";
+    }
+}
