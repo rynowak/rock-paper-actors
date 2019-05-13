@@ -11,8 +11,6 @@
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Rochambot.Core\Rochambot.Core.csproj" />
-  </ItemGroup>
+  <Import Project="..\Rochambot.Shared\Rochambot.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -60,15 +60,15 @@ namespace GameMaster
                         message.Body
                                .FromUTF8Bytes()
                                .To<SessionResult>()
-                               .Score();
+                               .DetermineScore();
 
-                    var respMessage =
+                    var responseMessage =
                         new Message(sessionResult.ToJson().ToUTF8Bytes())
                         {
                             SessionId = message.ReplyToSessionId
                         };
 
-                    await _sessionResultsClient.SendAsync(respMessage);
+                    await _sessionResultsClient.SendAsync(responseMessage);
                     await session.CompleteAsync(message.SystemProperties.LockToken);
                 }
             }
