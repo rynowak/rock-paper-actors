@@ -9,7 +9,7 @@
 <p>PlayerShape: @playerShape</p>
 <p>Opponent: @GameClient.Opponent?.Id</p>
 
-@if(GameClient.Opponent == null)
+@if (GameClient.Opponent is null)
 {
     <div id="RequestGame">
         <button type="button" class="btn btn-primary btn-lg" onclick="@RequestGame">Request Game</button>
@@ -61,8 +61,8 @@ else
         playerShape = playerPick;
         status = "Waiting for bot...";
         disabled = true;
-        botShape = await GameClient.RequestShape(playerPick);
-        sessionResult = await GameClient.SendShapesToGameMaster(playerShape, botShape);
+        botShape = await GameClient.RequestShapeAsync(playerPick);
+        sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
         disabled = false;
         status = sessionResult.Summary;
     }
@@ -70,7 +70,7 @@ else
     async Task RequestGame()
     {
         status = "Requesting game...";
-        await GameClient.RequestGame();
+        await GameClient.RequestGameAsync();
         status = "Game found.";
     }
 }

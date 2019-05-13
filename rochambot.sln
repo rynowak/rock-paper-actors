@@ -11,9 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C96B17F5-6CB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchMaker", "src\MatchMaker\MatchMaker.csproj", "{61287F97-301A-4500-A18C-02D32C2A9279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameMaster", "src\GameMaster\GameMaster.csproj", "{209D147B-E5A2-4757-B573-5D90B56FFBAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameMaster", "src\GameMaster\GameMaster.csproj", "{209D147B-E5A2-4757-B573-5D90B56FFBAF}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Rochambot.Shared", "src\Rochambot.Shared\Rochambot.Shared.shproj", "{66E2A936-848D-46CB-A2C7-BF6A2C0FA608}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Rochambot.Shared\Rochambot.Shared.projitems*{66e2a936-848d-46cb-a2c7-bf6a2c0fa608}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -80,6 +85,7 @@ Global
 		{EBAD037F-21CE-459B-BE8A-A81F1EB77702} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 		{61287F97-301A-4500-A18C-02D32C2A9279} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 		{209D147B-E5A2-4757-B573-5D90B56FFBAF} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
+		{66E2A936-848D-46CB-A2C7-BF6A2C0FA608} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9359A577-3D5C-40AF-AEE0-5341FBF0A194}
