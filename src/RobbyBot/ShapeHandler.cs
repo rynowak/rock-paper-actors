@@ -36,8 +36,8 @@ namespace RobbyBot
 
         public override Task StartAsync(CancellationToken token)
         {
-            _requestQueue = new SessionClient(_configuration["ConnectionString"], _configuration["RequestQueueName"]);
-            _responseQueue = new QueueClient(_configuration["ConnectionString"], _configuration["ResponseQueueName"]);
+            _requestQueue = new SessionClient(_configuration["AzureServiceBusConnectionString"], _configuration["RequestQueueName"]);
+            _responseQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["ResponseQueueName"]);
 
             return base.StartAsync(token);
         }

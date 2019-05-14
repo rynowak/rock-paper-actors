@@ -25,8 +25,8 @@ namespace RobbyBot
 
         public Task StartAsync(CancellationToken token)
         {
-            _botRequestQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotRequestQueueName"]);
-            _botResponseQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotResponseQueueName"]);
+            _botRequestQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["BotRequestQueueName"]);
+            _botResponseQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["BotResponseQueueName"]);
             _botRequestQueue.RegisterMessageHandler(ReceivedGameRequestAsync, ReceivedGameRequestErrorAsync);
 
             return Task.CompletedTask;

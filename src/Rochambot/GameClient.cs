@@ -22,11 +22,11 @@ namespace Rochambot
 
         public GameClient(IConfiguration configuration)
         {
-            _requestClient = new QueueClient(configuration["ConnectionString"], configuration["RequestQueueName"]);
-            _responseClient = new SessionClient(configuration["ConnectionString"], configuration["ResponseQueueName"]);
-            _gameRequest = new QueueClient(configuration["ConnectionString"], configuration["GameQueueName"]);
-            _playerShapeSelectionClient = new QueueClient(configuration["ConnectionString"], configuration["PlayerShapeSelectionQueueName"]);
-            _sessionResultsClient = new SessionClient(configuration["ConnectionString"], configuration["SessionResultsQueueName"]);
+            _requestClient = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["RequestQueueName"]);
+            _responseClient = new SessionClient(configuration["AzureServiceBusConnectionString"], configuration["ResponseQueueName"]);
+            _gameRequest = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["GameQueueName"]);
+            _playerShapeSelectionClient = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["PlayerShapeSelectionQueueName"]);
+            _sessionResultsClient = new SessionClient(configuration["AzureServiceBusConnectionString"], configuration["SessionResultsQueueName"]);
         }
 
         public async Task<Shape> RequestShapeAsync(Shape playerPick)

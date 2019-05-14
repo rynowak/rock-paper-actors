@@ -21,10 +21,10 @@ namespace MatchMaker
         public MatchMaker(ILogger<MatchMaker> logger, IConfiguration configuration)
         {
             _logger = logger;
-            _responseQueue = new QueueClient(configuration["ConnectionString"], configuration["ResponseQueueName"]);
-            _botRequestQueue = new QueueClient(configuration["ConnectionString"], configuration["BotRequestQueueName"]);
-            _botResponseQueue = new SessionClient(configuration["ConnectionString"], configuration["BotResponseQueueName"]);
-            _gameQueue = new MessageReceiver(configuration["ConnectionString"], configuration["GameQueueName"]);
+            _responseQueue = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["ResponseQueueName"]);
+            _botRequestQueue = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["BotRequestQueueName"]);
+            _botResponseQueue = new SessionClient(configuration["AzureServiceBusConnectionString"], configuration["BotResponseQueueName"]);
+            _gameQueue = new MessageReceiver(configuration["AzureServiceBusConnectionString"], configuration["GameQueueName"]);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

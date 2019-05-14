@@ -26,8 +26,8 @@ namespace GameMaster
 
         public override Task StartAsync(CancellationToken token)
         {
-            _playerShapeSelectionClient = new SessionClient(_configuration["ConnectionString"], _configuration["PlayerShapeSelectionQueueName"]);
-            _sessionResultsClient = new QueueClient(_configuration["ConnectionString"], _configuration["SessionResultsQueueName"]);
+            _playerShapeSelectionClient = new SessionClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayerShapeSelectionQueueName"]);
+            _sessionResultsClient = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["SessionResultsQueueName"]);
 
             return base.StartAsync(token);
         }
