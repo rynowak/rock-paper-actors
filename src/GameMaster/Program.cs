@@ -14,10 +14,10 @@ namespace GameMaster
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    var settings = config.Build();
                     config.AddAzureAppConfiguration(options => 
                     {
-                        options.Connect(settings["ConnectionStrings:AzureAppConfig"]);
+                        var cnStr = Environment.GetEnvironmentVariable("AzureAppConfigConnectionString");
+                        options.Connect(cnStr);
                     });
                 })
                 .ConfigureServices(services => services.AddHostedService<GameMaster>());

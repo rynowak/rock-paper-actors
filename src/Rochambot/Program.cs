@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Hosting;
@@ -13,13 +14,13 @@ namespace Rochambot
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    var settings = config.Build();
                     config.AddAzureAppConfiguration(options => 
                     {
-                        options.Connect(settings["ConnectionStrings:AzureAppConfig"]);
+                        var cnStr = Environment.GetEnvironmentVariable("AzureAppConfigConnectionString");
+                        options.Connect(cnStr);
                     });
                 })
                 .ConfigureWebHostDefaults(webBuilder => 
                     webBuilder.UseStartup<Startup>());
     }
-}
+}   

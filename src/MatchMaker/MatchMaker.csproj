@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <UserSecretsId>dotnet-MatchMaker-E65CF0C8-B993-4543-AF43-01ACAFD0711D</UserSecretsId>
+    <UserSecretsId>dotnet-MatchMaker-429D3806-92AF-4148-BD62-F40FCF1CC969</UserSecretsId>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 

@@ -24,7 +24,10 @@
             "args": [],
             "cwd": "${workspaceFolder}/src/GameMaster",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "internalConsole",
+            "env": {
+                "AzureAppConfigConnectionString" : ""
+            }
         },
         {
             "name": "MatchMaker",
@@ -35,7 +38,10 @@
             "args": [],
             "cwd": "${workspaceFolder}/src/MatchMaker",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "internalConsole",
+            "env": {
+                "AzureAppConfigConnectionString" : ""
+            }
         },
         {
             "name": "RobbyBot",
@@ -46,7 +52,10 @@
             "args": [],
             "cwd": "${workspaceFolder}/src/RobbyBot",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "internalConsole",
+            "env": {
+                "AzureAppConfigConnectionString" : ""
+            }
         },
         {
             "name": "WebClient",
@@ -61,7 +70,8 @@
                 "enabled": true
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "AzureAppConfigConnectionString" : ""
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
