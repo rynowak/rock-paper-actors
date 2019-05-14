@@ -1,24 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
-using System.Text;
-using Microsoft.Azure.ServiceBus.Core;
 
 namespace RobbyBot
 {
     public class GameRequestHandler : IHostedService
     {
-        private readonly ILogger<GameRequestHandler> _logger;
-        private IQueueClient _botRequestQueue;
-        private IQueueClient _botResponseQueue;
-        private IConfiguration _configuration;
-        private readonly string _botId;
+        readonly ILogger<GameRequestHandler> _logger;
+        readonly IConfiguration _configuration;
+        readonly string _botId;
+
+        IQueueClient _botRequestQueue;
+        IQueueClient _botResponseQueue;
 
         public GameRequestHandler(ILogger<GameRequestHandler> logger, IConfiguration configuration)
         {
@@ -29,33 +25,30 @@ namespace RobbyBot
 
         public Task StartAsync(CancellationToken token)
         {
-            _botRequestQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotRequestQueueName"]);
-            _botResponseQueue = new QueueClient(_configuration["ConnectionString"], _configuration["BotResponseQueueName"]);
+            _botRequestQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["BotRequestQueueName"]);
+            _botResponseQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["BotResponseQueueName"]);
+            _botRequestQueue.RegisterMessageHandler(ReceivedGameRequestAsync, ReceivedGameRequestErrorAsync);
 
-            _botRequestQueue.RegisterMessageHandler(ReceivedGameRequest, ReceivedGameRequestError);
             return Task.CompletedTask;
         }
 
-        private Task ReceivedGameRequestError(ExceptionReceivedEventArgs arg)
+        Task ReceivedGameRequestAsync(Message message, CancellationToken _) =>
+            _botResponseQueue.SendAsync(new Message
+            {
+                SessionId = message.ReplyToSessionId,
+                ReplyToSessionId = _botId
+            });
+
+        Task ReceivedGameRequestErrorAsync(ExceptionReceivedEventArgs arg)
         {
             _logger.LogError(arg.Exception, "Error receiving game request");
             return Task.CompletedTask;
         }
 
-        private async Task ReceivedGameRequest(Message message, CancellationToken arg2)
-        {
-            var gameRequest = new Message
-            {
-                SessionId = message.ReplyToSessionId,
-                ReplyToSessionId = _botId
-            };
-            await _botResponseQueue.SendAsync(gameRequest);
-        }
-
         public async Task StopAsync(CancellationToken token)
         {
-            await _botRequestQueue.CloseAsync();
-            await _botResponseQueue.CloseAsync();
+            await _botRequestQueue?.CloseAsync();
+            await _botResponseQueue?.CloseAsync();
         }
     }
 }

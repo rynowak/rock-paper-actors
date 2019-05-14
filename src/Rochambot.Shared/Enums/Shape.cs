@@ -1,5 +1,4 @@
-
-namespace GameMaster
+namespace Rochambot
 {
     public enum Shape
     {
