@@ -3,7 +3,7 @@
 
 <h1>Rochambot!</h1>
 
-<p>GameId: @GameClient.Id</p>
+<p>GameId: @GameClient.GameId</p>
 <p>Status: @status</p>
 <p>BotShape: @botShape</p>
 <p>PlayerShape: @playerShape</p>
@@ -62,7 +62,7 @@ else
         status = "Waiting for bot...";
         disabled = true;
         botShape = await GameClient.RequestShapeAsync(playerPick);
-        sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
+        //sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
         disabled = false;
         status = sessionResult.Summary;
     }

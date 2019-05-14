@@ -1,83 +1,49 @@
 using System;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Rochambot
 {
     public class GameClient : IAsyncDisposable
     {
-        readonly IQueueClient _requestClient;
-        readonly ISessionClient _responseClient;
-        readonly IQueueClient _gameRequest;
-        readonly ISessionClient _sessionResultsClient;
-        readonly IQueueClient _playerShapeSelectionClient;
-
-        IMessageSession _session;
-        IMessageSession _scoringSession;
-
-        public string Id { get; } = Guid.NewGuid().ToString();
-
+        private readonly IQueueClient _requestClient;
+        private readonly ISessionClient _responseClient;
+        private readonly IQueueClient _gameRequest;
+        private IMessageSession _session;
+        private ITopicClient _playTopicClient;
+        private ManagementClient _managementClient;
+        private string _playerSubscriptionName;
+        public string GameId { get; } = Guid.NewGuid().ToString();
+        public string PlayerId { get; } = "bradyg";
         public Opponent Opponent { get; private set; }
+        IConfiguration _configuration;
 
         public GameClient(IConfiguration configuration)
         {
-            _requestClient = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["RequestQueueName"]);
-            _responseClient = new SessionClient(configuration["AzureServiceBusConnectionString"], configuration["ResponseQueueName"]);
-            _gameRequest = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["GameQueueName"]);
-            _playerShapeSelectionClient = new QueueClient(configuration["AzureServiceBusConnectionString"], configuration["PlayerShapeSelectionQueueName"]);
-            _sessionResultsClient = new SessionClient(configuration["AzureServiceBusConnectionString"], configuration["SessionResultsQueueName"]);
+            _configuration = configuration;
+            _requestClient = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["RequestQueueName"]);
+            _responseClient = new SessionClient(_configuration["AzureServiceBusConnectionString"], _configuration["ResponseQueueName"]);
+            _gameRequest = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["GameQueueName"]);
+            _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
         }
 
         public async Task<Shape> RequestShapeAsync(Shape playerPick)
         {
-            await StartSessionAsync();
-            await _requestClient.SendAsync(new Message
-            {
-                SessionId = Opponent.Id,
-                ReplyToSessionId = Id
-            });
+            await VerifySubscriptionExistsForPlayer();
 
-            var message = await _session.ReceiveAsync();
-            var shape = message.Body.FromUTF8Bytes();
+            var message = new Message();
+            message.UserProperties["PlayerId"] = "webclient";
+            message.UserProperties["Opponent"] = Opponent.Id;
+            message.UserProperties["GameId"] = GameId;
+            message.UserProperties["Shape"] = playerPick;
 
-            await _session.CompleteAsync(message.SystemProperties.LockToken);
-
-            return shape.ToEnum<Shape>();
-        }
-
-        public async Task<SessionResult> SendShapesToGameMasterAsync(Shape playerPick, Shape botPick)
-        {
-            await StartScoringSessionAsync();
-
-            var sessionResult = new SessionResult
-            {
-                Player1 = new PlayerResult
-                {
-                    PlayerId = Id,
-                    ShapeSelected = playerPick
-                },
-                Player2 = new PlayerResult
-                {
-                    PlayerId = Opponent.Id,
-                    ShapeSelected = botPick
-                },
-                SessionEnd = DateTime.Now
-            };
-
-            await _playerShapeSelectionClient.SendAsync(new Message
-            {
-                SessionId = Id,
-                ReplyToSessionId = Id,
-                Body = sessionResult.ToJson().ToUTF8Bytes()
-            });
-
-            var scoringResultMessage = await _scoringSession.ReceiveAsync();
-            var scoringResult = scoringResultMessage.Body.FromUTF8Bytes();
-
-            await _scoringSession.CompleteAsync(scoringResultMessage.SystemProperties.LockToken);
-
-            return scoringResult.To<SessionResult>();
+            await _playTopicClient.SendAsync(message);
+            return playerPick;
         }
 
         public async Task RequestGameAsync()
@@ -85,7 +51,7 @@ namespace Rochambot
             await StartSessionAsync();
             await _gameRequest.SendAsync(new Message
             {
-                ReplyToSessionId = Id
+                ReplyToSessionId = GameId
             });
 
             var gameData = await _session.ReceiveAsync();
@@ -95,19 +61,24 @@ namespace Rochambot
             await _session.CompleteAsync(gameData.SystemProperties.LockToken);
         }
 
+        public async Task VerifySubscriptionExistsForPlayer()
+        {
+            _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
+            _playerSubscriptionName = $"player-{PlayerId}";
+
+            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _playerSubscriptionName)))
+            {
+                await _managementClient.CreateSubscriptionAsync(
+                    new SubscriptionDescription(_configuration["PlayTopic"], _playerSubscriptionName),
+                    new RuleDescription($"player{PlayerId}rule", new SqlFilter($"PlayerId = '{PlayerId}'")));
+            }
+        }
+
         public async Task StartSessionAsync()
         {
             if (_session is null)
             {
-                _session = await _responseClient.AcceptMessageSessionAsync(Id);
-            }
-        }
-
-        public async Task StartScoringSessionAsync()
-        {
-            if (_scoringSession is null)
-            {
-                _scoringSession = await _sessionResultsClient.AcceptMessageSessionAsync(Id);
+                _session = await _responseClient.AcceptMessageSessionAsync(GameId);
             }
         }
 
@@ -116,7 +87,6 @@ namespace Rochambot
             await _requestClient?.CloseAsync();
             await _session?.CloseAsync();
             await _responseClient?.CloseAsync();
-            await _playerShapeSelectionClient?.CloseAsync();
         }
     }
 }
