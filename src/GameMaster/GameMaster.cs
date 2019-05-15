@@ -17,6 +17,7 @@ namespace GameMaster
         private ManagementClient _managementClient;
         private ISubscriptionClient _playSubscriptionClient;
         private string _gameMasterSubscriptionName = "gamemaster";
+        private TopicClient _playTopicClient;
 
         public GameMaster(ILogger<GameMaster> logger, IConfiguration configuration)
         {
@@ -38,6 +39,8 @@ namespace GameMaster
                 MaxConcurrentCalls = 1
             });
 
+            _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
+
             await base.StartAsync(token);
         }
 
@@ -50,6 +53,14 @@ namespace GameMaster
         private async Task OnMessageReceived(Message message, CancellationToken token)
         {
             _logger.LogInformation($"Received message: {message.SystemProperties.SequenceNumber}");
+
+            var messageToBot = new Message();
+            messageToBot.UserProperties["To"] = message.UserProperties["Opponent"];
+            messageToBot.UserProperties["From"] = "GameMaster";
+            messageToBot.UserProperties["Opponent"] = message.UserProperties["From"];
+            messageToBot.UserProperties["GameId"] = message.UserProperties["GameId"];
+            await _playTopicClient.SendAsync(messageToBot);
+
             await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
         }
 

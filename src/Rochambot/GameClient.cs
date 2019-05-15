@@ -19,7 +19,7 @@ namespace Rochambot
         private ManagementClient _managementClient;
         private string _playerSubscriptionName;
         public string GameId { get; } = Guid.NewGuid().ToString();
-        public string PlayerId { get; } = "bradyg"; // todo: add auth and use authz here instead of a static string
+        public string PlayerId { get; } = "somehuman"; // todo: add auth and use authz here instead of a static string
         public Opponent Opponent { get; private set; }
         IConfiguration _configuration;
 
@@ -38,6 +38,7 @@ namespace Rochambot
 
             var message = new Message();
             message.UserProperties["To"] = "GameMaster";
+            message.UserProperties["From"] = PlayerId;
             message.UserProperties["Opponent"] = Opponent.Id;
             message.UserProperties["GameId"] = GameId;
             message.UserProperties["Shape"] = playerPick.ToString();
