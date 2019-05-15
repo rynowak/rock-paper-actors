@@ -61,7 +61,7 @@ else
         playerShape = playerPick;
         status = "Waiting for bot...";
         disabled = true;
-        botShape = await GameClient.RequestShapeAsync(playerPick);
+        await GameClient.PlayShapeAsync(playerPick);
         //sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
         disabled = false;
         status = sessionResult.Summary;

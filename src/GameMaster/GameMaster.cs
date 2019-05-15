@@ -73,7 +73,9 @@ namespace GameMaster
             _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
             if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _gameMasterSubscriptionName)))
             {
-                await _managementClient.CreateSubscriptionAsync(_configuration["PlayTopic"], _gameMasterSubscriptionName);
+                await _managementClient.CreateSubscriptionAsync(
+                    new SubscriptionDescription(_configuration["PlayTopic"], _gameMasterSubscriptionName),
+                    new RuleDescription($"gamemasterrule", new SqlFilter($"To = 'GameMaster'")));
             }
         }
     }
