@@ -10,8 +10,6 @@ az servicebus queue delete --namespace-name $namespace --resource-group $group -
 az servicebus queue delete --namespace-name $namespace --resource-group $group --name matchrequestqueue 
 az servicebus queue delete --namespace-name $namespace --resource-group $group --name shaperequestqueue
 az servicebus queue delete --namespace-name $namespace --resource-group $group --name shaperesponsequeue
-az servicebus queue delete --namespace-name $namespace --resource-group $group --name playershapeselectedqueue
-az servicebus queue delete --namespace-name $namespace --resource-group $group --name sessionresults
 
 echo 'Creating the queues'
 az servicebus queue create --namespace-name $namespace --resource-group $group --name botrequestqueue --enable-session false
@@ -19,8 +17,6 @@ az servicebus queue create --namespace-name $namespace --resource-group $group -
 az servicebus queue create --namespace-name $namespace --resource-group $group --name matchrequestqueue --enable-session false
 az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperequestqueue --enable-session true
 az servicebus queue create --namespace-name $namespace --resource-group $group --name shaperesponsequeue --enable-session true
-az servicebus queue create --namespace-name $namespace --resource-group $group --name playershapeselectedqueue --enable-session true
-az servicebus queue create --namespace-name $namespace --resource-group $group --name sessionresults --enable-session true
 
 echo 'List of new queues'
 az servicebus queue list --namespace-name $namespace -g $group --query '[].{Name:name,Sessions:requiresSession}' -o table 

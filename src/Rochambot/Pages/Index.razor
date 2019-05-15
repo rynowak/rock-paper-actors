@@ -46,7 +46,6 @@ else
 
     Shape botShape;
     Shape playerShape;
-    SessionResult sessionResult;
     string status;
     bool disabled = false;
     string winLossStatus = "normal";
@@ -62,9 +61,6 @@ else
         status = "Waiting for bot...";
         disabled = true;
         await GameClient.PlayShapeAsync(playerPick);
-        //sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
-        disabled = false;
-        status = sessionResult.Summary;
     }
 
     async Task RequestGame()

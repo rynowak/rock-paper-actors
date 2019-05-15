@@ -13,7 +13,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Opponent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\OpponentRequest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\PlayerResult.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\SessionResult.cs" />
   </ItemGroup>
 </Project>

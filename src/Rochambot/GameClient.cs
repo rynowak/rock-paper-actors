@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Rochambot
@@ -14,18 +15,21 @@ namespace Rochambot
         private readonly IQueueClient _requestClient;
         private readonly ISessionClient _responseClient;
         private readonly IQueueClient _gameRequest;
+        private readonly ILogger<GameClient> _logger;
         private IMessageSession _session;
         private ITopicClient _playTopicClient;
-        private ManagementClient _managementClient;
-        private string _playerSubscriptionName;
         public string GameId { get; } = Guid.NewGuid().ToString();
         public string PlayerId { get; } = "somehuman"; // todo: add auth and use authz here instead of a static string
         public Opponent Opponent { get; private set; }
-        IConfiguration _configuration;
+        public string PlayerSubscriptionName { get; private set; }
 
-        public GameClient(IConfiguration configuration)
+        IConfiguration _configuration;
+        private SubscriptionClient _playSubscriptionClient;
+
+        public GameClient(IConfiguration configuration, ILogger<GameClient> logger)
         {
             _configuration = configuration;
+            _logger = logger;
             _requestClient = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["RequestQueueName"]);
             _responseClient = new SessionClient(_configuration["AzureServiceBusConnectionString"], _configuration["ResponseQueueName"]);
             _gameRequest = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["GameQueueName"]);
@@ -40,7 +44,6 @@ namespace Rochambot
             message.UserProperties["To"] = "GameMaster";
             message.UserProperties["From"] = PlayerId;
             message.UserProperties["Opponent"] = Opponent.Id;
-            message.UserProperties["GameId"] = GameId;
             message.UserProperties["Shape"] = playerPick.ToString();
 
             await _playTopicClient.SendAsync(message);
@@ -49,23 +52,58 @@ namespace Rochambot
 
         public async Task VerifySubscriptionExistsForPlayerAsync()
         {
-            _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
-            _playerSubscriptionName = $"player-{PlayerId}";
+            var managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
+            PlayerSubscriptionName = $"player-{PlayerId}";
 
-            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _playerSubscriptionName)))
+            if(!(await managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], PlayerSubscriptionName)))
             {
-                await _managementClient.CreateSubscriptionAsync(
-                    new SubscriptionDescription(_configuration["PlayTopic"], _playerSubscriptionName),
-                    new RuleDescription($"player{PlayerId}rule", new SqlFilter($"To = '{PlayerId}'")));
+                await managementClient.CreateSubscriptionAsync
+                (
+                    new SubscriptionDescription(_configuration["PlayTopic"], PlayerSubscriptionName),
+                    new RuleDescription($"player{PlayerId}rule", new SqlFilter($"To = '{PlayerId}'"))
+                );
             }
         }
 
+        private async Task OnMessageReceived(Message message, CancellationToken token)
+        {
+            _logger.LogInformation($"Received message: {message.SystemProperties.SequenceNumber}");
+
+            var messageToBot = new Message();
+            var gameId = message.UserProperties["GameId"];
+            var opponent = message.UserProperties["Opponent"];
+
+            await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        private Task OnMessageHandlingException(ExceptionReceivedEventArgs args)
+        {
+            _logger.LogError(args.Exception, $"Message handler error: {Environment.NewLine}Endpoint: {args.ExceptionReceivedContext.Endpoint}{Environment.NewLine}Client ID: {args.ExceptionReceivedContext.ClientId}{Environment.NewLine}Entity Path: {args.ExceptionReceivedContext.EntityPath}");
+            return Task.CompletedTask;
+        }
         public async Task StartSessionAsync()
         {
             if (_session is null)
             {
                 _session = await _responseClient.AcceptMessageSessionAsync(GameId);
             }
+        }
+
+        private void Subscribe()
+        {
+            _playSubscriptionClient = new SubscriptionClient(
+                _configuration["AzureServiceBusConnectionString"],
+                _configuration["PlayTopic"],
+                PlayerSubscriptionName);
+
+            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, 
+                new MessageHandlerOptions(OnMessageHandlingException) 
+                {
+                    AutoComplete = false,
+                    MaxConcurrentCalls = 1
+                });
+
+            _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
         }
 
         public async Task RequestGameAsync()
@@ -88,6 +126,8 @@ namespace Rochambot
             await _requestClient?.CloseAsync();
             await _session?.CloseAsync();
             await _responseClient?.CloseAsync();
+            await _playTopicClient.CloseAsync();
+            await _playSubscriptionClient.CloseAsync();
         }
     }
 }

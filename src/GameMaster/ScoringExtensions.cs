@@ -4,7 +4,7 @@ namespace GameMaster
 {
     public static class ScoringExtensions
     {
-        public static SessionResult DetermineScore(this SessionResult result) =>
+        public static Turn DetermineScore(this Turn result) =>
             (result.Player1.ShapeSelected, result.Player2.ShapeSelected) switch
         {
             (Shape.Paper, Shape.Rock) => result.PaperCoversRock(),
@@ -16,58 +16,58 @@ namespace GameMaster
             (_, _) => result.TieGame(),
         };
 
-        static SessionResult PaperCoversRock(this SessionResult result)
+        static Turn PaperCoversRock(this Turn turn)
         {
-            result.Summary = "You win! Paper covers rock.";
-            result.Player1.IsWinner = true;
-            result.Player2.IsWinner = false;
-            return result;
+            turn.Summary = "You win! Paper covers rock.";
+            turn.Player1.IsWinner = true;
+            turn.Player2.IsWinner = false;
+            return turn;
         }
 
-        static SessionResult PaperCutByScissors(this SessionResult result)
+        static Turn PaperCutByScissors(this Turn turn)
         {
-            result.Summary = "You lose! Scissors cut paper.";
-            result.Player1.IsWinner = false;
-            result.Player2.IsWinner = true;
-            return result;
+            turn.Summary = "You lose! Scissors cut paper.";
+            turn.Player1.IsWinner = false;
+            turn.Player2.IsWinner = true;
+            return turn;
         }
-        static SessionResult RockCoveredByPaper(this SessionResult result)
+        static Turn RockCoveredByPaper(this Turn turn)
         {
-            result.Summary = "You lose! Paper covers rock.";
-            result.Player1.IsWinner = false;
-            result.Player2.IsWinner = true;
-            return result;
+            turn.Summary = "You lose! Paper covers rock.";
+            turn.Player1.IsWinner = false;
+            turn.Player2.IsWinner = true;
+            return turn;
         }
-        static SessionResult RockBreaksScissors(this SessionResult result)
+        static Turn RockBreaksScissors(this Turn turn)
         {
-            result.Summary = "You Win! Rock breaks scissors.";
-            result.Player1.IsWinner = true;
-            result.Player2.IsWinner = false;
-            return result;
-        }
-
-        static SessionResult ScissorsCutPaper(this SessionResult result)
-        {
-            result.Summary = "You Win! Scissors cut paper.";
-            result.Player1.IsWinner = true;
-            result.Player2.IsWinner = false;
-            return result;
+            turn.Summary = "You Win! Rock breaks scissors.";
+            turn.Player1.IsWinner = true;
+            turn.Player2.IsWinner = false;
+            return turn;
         }
 
-        static SessionResult ScissorsBrokenByRock(this SessionResult result)
+        static Turn ScissorsCutPaper(this Turn turn)
         {
-            result.Summary = "You lose. Rock breaks scissors.";
-            result.Player1.IsWinner = false;
-            result.Player2.IsWinner = true;
-            return result;
+            turn.Summary = "You Win! Scissors cut paper.";
+            turn.Player1.IsWinner = true;
+            turn.Player2.IsWinner = false;
+            return turn;
         }
 
-        static SessionResult TieGame(this SessionResult result)
+        static Turn ScissorsBrokenByRock(this Turn turn)
         {
-            result.Summary = "Tie";
-            result.Player1.IsWinner = false;
-            result.Player2.IsWinner = false;
-            return result;
+            turn.Summary = "You lose. Rock breaks scissors.";
+            turn.Player1.IsWinner = false;
+            turn.Player2.IsWinner = true;
+            return turn;
+        }
+
+        static Turn TieGame(this Turn turn)
+        {
+            turn.Summary = "Tie";
+            turn.Player1.IsWinner = false;
+            turn.Player2.IsWinner = false;
+            return turn;
         }
     }
 }

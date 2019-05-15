@@ -1,4 +1,5 @@
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,19 +14,18 @@ namespace RobbyBot
     public class ShapeHandler : BackgroundService
     {
         static readonly Random Random = new Random((int)DateTime.Now.Ticks);
-        static readonly string[] Shapes = new string[] 
+        static readonly Shape[] Shapes = new Shape[] 
         {
-            nameof(Shape.Rock),
-            nameof(Shape.Paper),
-            nameof(Shape.Scissors)
+            Shape.Rock, Shape.Paper, Shape.Scissors
         };
 
         readonly ILogger<ShapeHandler> _logger;
         readonly IConfiguration _configuration;
         readonly string _botId;
-
-        ISessionClient _requestQueue;
-        IQueueClient _responseQueue;
+        private TopicClient _playTopicClient;
+        private ISubscriptionClient _playSubscriptionClient;
+        private ManagementClient _managementClient;
+        private string _playerSubscriptionName;
 
         public ShapeHandler(ILogger<ShapeHandler> logger, IConfiguration configuration)
         {
@@ -34,45 +34,79 @@ namespace RobbyBot
             _botId = _configuration["BotId"];
         }
 
-        public override Task StartAsync(CancellationToken token)
+        public override async Task StartAsync(CancellationToken token)
         {
-            _requestQueue = new SessionClient(_configuration["AzureServiceBusConnectionString"], _configuration["RequestQueueName"]);
-            _responseQueue = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["ResponseQueueName"]);
+            await VerifySubscriptionExistsForPlayerAsync();
 
-            return base.StartAsync(token);
+            _playSubscriptionClient = new SubscriptionClient(
+                _configuration["AzureServiceBusConnectionString"],
+                _configuration["PlayTopic"],
+                _playerSubscriptionName);
+
+            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, 
+                new MessageHandlerOptions(OnMessageHandlingException) 
+                {
+                    AutoComplete = false,
+                    MaxConcurrentCalls = 1
+                });
+
+            _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
+
+            await base.StartAsync(token);
         }
 
         public override async Task StopAsync(CancellationToken token)
         {
-            await _requestQueue.CloseAsync();
-            await _responseQueue.CloseAsync();
-
+            await _managementClient.CloseAsync();
+            await _playTopicClient.CloseAsync();
+            await _playSubscriptionClient.CloseAsync();
             await base.StopAsync(token);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var session = await _requestQueue.AcceptMessageSessionAsync(_botId);
             while (!stoppingToken.IsCancellationRequested)
             {
-                var message = await session.ReceiveAsync();
-                if (message is null)
-                {
-                    continue;
-                }
-
-                _logger.LogInformation($"Message Received {message}");
-
-                var responseMessage = new Message(Encoding.UTF8.GetBytes(Shapes[Random.Next(0, 2)]))
-                {
-                    SessionId = message.ReplyToSessionId
-                };
-
-                await _responseQueue.SendAsync(responseMessage);
-                await session.CompleteAsync(message.SystemProperties.LockToken);
+                _logger.LogInformation($"{_botId} running at {DateTimeOffset.Now}");
+                await Task.Delay(10000);
             }
+        }
 
-            await session.CloseAsync();
+        private async Task OnMessageReceived(Message message, CancellationToken token)
+        {
+            _logger.LogInformation($"Received message: {message.SystemProperties.SequenceNumber}");
+
+            var messageToGameMaster = new Message();
+            messageToGameMaster.UserProperties["GameId"] = message.UserProperties["GameId"];
+            messageToGameMaster.UserProperties["To"] = "GameMaster";
+            messageToGameMaster.UserProperties["From"] = _botId;
+            messageToGameMaster.UserProperties["Opponent"] = message.UserProperties["Opponent"];
+            messageToGameMaster.UserProperties["Shape"] = Shapes[Random.Next(0, 2)].ToString();
+                
+            await _playTopicClient.SendAsync(messageToGameMaster);
+
+            await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        private Task OnMessageHandlingException(ExceptionReceivedEventArgs args)
+        {
+            _logger.LogError(args.Exception, $"Message handler error: {Environment.NewLine}Endpoint: {args.ExceptionReceivedContext.Endpoint}{Environment.NewLine}Client ID: {args.ExceptionReceivedContext.ClientId}{Environment.NewLine}Entity Path: {args.ExceptionReceivedContext.EntityPath}");
+            return Task.CompletedTask;
+        }
+
+        public async Task VerifySubscriptionExistsForPlayerAsync()
+        {
+            _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
+            _playerSubscriptionName = $"player-{_botId}";
+
+            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _playerSubscriptionName)))
+            {
+                await _managementClient.CreateSubscriptionAsync
+                (
+                    new SubscriptionDescription(_configuration["PlayTopic"], _playerSubscriptionName),
+                    new RuleDescription($"player{_botId}rule", new SqlFilter($"To = '{_botId}'"))
+                );
+            }
         }
     }
 }

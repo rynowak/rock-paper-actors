@@ -12,11 +12,11 @@ namespace GameMaster
 {
     public class GameMaster : BackgroundService
     {
+        private static string Name { get; } = "GameMaster";
         private readonly IConfiguration _configuration;
         private readonly ILogger<GameMaster> _logger;
         private ManagementClient _managementClient;
         private ISubscriptionClient _playSubscriptionClient;
-        private string _gameMasterSubscriptionName = "gamemaster";
         private TopicClient _playTopicClient;
 
         public GameMaster(ILogger<GameMaster> logger, IConfiguration configuration)
@@ -32,12 +32,14 @@ namespace GameMaster
             _playSubscriptionClient = new SubscriptionClient(
                 _configuration["AzureServiceBusConnectionString"],
                 _configuration["PlayTopic"],
-                _gameMasterSubscriptionName);
+                GameMaster.Name);
 
-            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, new MessageHandlerOptions(OnMessageHandlingException) {
-                AutoComplete = false,
-                MaxConcurrentCalls = 1
-            });
+            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, 
+                new MessageHandlerOptions(OnMessageHandlingException) 
+                {
+                    AutoComplete = false,
+                    MaxConcurrentCalls = 1
+                });
 
             _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
 
@@ -47,6 +49,8 @@ namespace GameMaster
         public override async Task StopAsync(CancellationToken token)
         {
             await _playSubscriptionClient.CloseAsync();
+            await _managementClient.CloseAsync();
+            await _playTopicClient.CloseAsync();
             await base.StopAsync(token);
         }
 
@@ -54,12 +58,16 @@ namespace GameMaster
         {
             _logger.LogInformation($"Received message: {message.SystemProperties.SequenceNumber}");
 
-            var messageToBot = new Message();
-            messageToBot.UserProperties["To"] = message.UserProperties["Opponent"];
-            messageToBot.UserProperties["From"] = "GameMaster";
-            messageToBot.UserProperties["Opponent"] = message.UserProperties["From"];
-            messageToBot.UserProperties["GameId"] = message.UserProperties["GameId"];
-            await _playTopicClient.SendAsync(messageToBot);
+            // todo: save the data
+            var shape = message.UserProperties["Shape"];
+            var gameId = message.UserProperties["GameId"];
+
+            var messageFromGameMaster = new Message();
+            messageFromGameMaster.UserProperties["GameId"] = message.UserProperties["GameId"];
+            messageFromGameMaster.UserProperties["To"] = message.UserProperties["Opponent"];
+            messageFromGameMaster.UserProperties["From"] = "GameMaster";
+            messageFromGameMaster.UserProperties["Opponent"] = message.UserProperties["From"];
+            await _playTopicClient.SendAsync(messageFromGameMaster);
 
             await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
         }
@@ -82,11 +90,14 @@ namespace GameMaster
         private async Task VerifyGameMasterSubscriptionExists()
         {
             _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
-            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _gameMasterSubscriptionName)))
+
+            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], GameMaster.Name)))
             {
-                await _managementClient.CreateSubscriptionAsync(
-                    new SubscriptionDescription(_configuration["PlayTopic"], _gameMasterSubscriptionName),
-                    new RuleDescription($"gamemasterrule", new SqlFilter($"To = 'GameMaster'")));
+                await _managementClient.CreateSubscriptionAsync
+                (
+                    new SubscriptionDescription(_configuration["PlayTopic"], GameMaster.Name),
+                    new RuleDescription($"gamemasterrule", new SqlFilter($"To = 'GameMaster'"))
+                );
             }
         }
     }
