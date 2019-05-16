@@ -5,14 +5,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
-using Rochambot;
 using Microsoft.Azure.ServiceBus.Management;
 
 namespace GameMaster
 {
     public class GameMaster : BackgroundService
     {
-        private static string Name { get; } = "GameMaster";
+        private const string Name = nameof(GameMaster);
         private readonly IConfiguration _configuration;
         private readonly ILogger<GameMaster> _logger;
         private ManagementClient _managementClient;
@@ -41,7 +40,10 @@ namespace GameMaster
                     MaxConcurrentCalls = 1
                 });
 
-            _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
+            _playTopicClient = 
+                new TopicClient(
+                    _configuration["AzureServiceBusConnectionString"], 
+                    _configuration["PlayTopic"]);
 
             await base.StartAsync(token);
         }
@@ -51,6 +53,7 @@ namespace GameMaster
             await _playSubscriptionClient.CloseAsync();
             await _managementClient.CloseAsync();
             await _playTopicClient.CloseAsync();
+
             await base.StopAsync(token);
         }
 
@@ -91,7 +94,7 @@ namespace GameMaster
         {
             _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
 
-            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], GameMaster.Name)))
+            if (!await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], GameMaster.Name))
             {
                 await _managementClient.CreateSubscriptionAsync
                 (
