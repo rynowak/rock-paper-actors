@@ -12,18 +12,13 @@ namespace Rochambot
 {
     public class GameClient : IAsyncDisposable
     {
+        private readonly IConfiguration _configuration;
         private readonly IQueueClient _requestClient;
         private readonly ISessionClient _responseClient;
         private readonly IQueueClient _gameRequest;
         private readonly ILogger<GameClient> _logger;
         private IMessageSession _session;
         private ITopicClient _playTopicClient;
-        public string GameId { get; } = Guid.NewGuid().ToString();
-        public string PlayerId { get; } = "somehuman"; // todo: add auth and use authz here instead of a static string
-        public Opponent Opponent { get; private set; }
-        public string PlayerSubscriptionName { get; private set; }
-
-        IConfiguration _configuration;
         private SubscriptionClient _playSubscriptionClient;
 
         public GameClient(IConfiguration configuration, ILogger<GameClient> logger)
@@ -35,6 +30,11 @@ namespace Rochambot
             _gameRequest = new QueueClient(_configuration["AzureServiceBusConnectionString"], _configuration["GameQueueName"]);
             _playTopicClient = new TopicClient(_configuration["AzureServiceBusConnectionString"], _configuration["PlayTopic"]);
         }
+
+        public string GameId { get; } = Guid.NewGuid().ToString();
+        public string PlayerId { get; } = "somehuman"; // todo: add auth and use authz here instead of a static string
+        public Opponent Opponent { get; private set; }
+        public string PlayerSubscriptionName { get; private set; }
 
         public async Task<Shape> PlayShapeAsync(Shape playerPick)
         {
@@ -56,7 +56,7 @@ namespace Rochambot
             var managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
             PlayerSubscriptionName = $"player-{PlayerId}";
 
-            if(!(await managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], PlayerSubscriptionName)))
+            if (!await managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], PlayerSubscriptionName))
             {
                 await managementClient.CreateSubscriptionAsync
                 (
@@ -97,8 +97,8 @@ namespace Rochambot
                 _configuration["PlayTopic"],
                 PlayerSubscriptionName);
 
-            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, 
-                new MessageHandlerOptions(OnMessageHandlingException) 
+            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived,
+                new MessageHandlerOptions(OnMessageHandlingException)
                 {
                     AutoComplete = false,
                     MaxConcurrentCalls = 1
@@ -127,8 +127,8 @@ namespace Rochambot
             await _requestClient?.CloseAsync();
             await _session?.CloseAsync();
             await _responseClient?.CloseAsync();
-            await _playTopicClient.CloseAsync();
-            await _playSubscriptionClient.CloseAsync();
+            await _playTopicClient?.CloseAsync();
+            await _playSubscriptionClient?.CloseAsync();
         }
     }
 }

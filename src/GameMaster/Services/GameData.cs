@@ -1,41 +1,41 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
-using System.Collections.Generic;
-using System.Net;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace GameMaster
 {
     public class GameData
     {
+        private readonly IConfiguration _configuration;
+        private readonly CosmosClient _cosmosClient;
+        private readonly CosmosContainer _gamesContainer;
+
         public GameData(IConfiguration configuration)
         {
-            Configuration = configuration;
-            CosmosClient = new CosmosClient(Configuration["CosmosEndpointUri"], Configuration["CosmosAccountKey"]);
-            GamesContainer = CosmosClient.Databases["Rochambot"].Containers["Games"];
+            _configuration = configuration;
+            _cosmosClient = new CosmosClient(_configuration["CosmosEndpointUri"], _configuration["CosmosAccountKey"]);
+            _gamesContainer = _cosmosClient.Databases["Rochambot"].Containers["Games"];
         }
-
-        public IConfiguration Configuration { get; }
-        public CosmosClient CosmosClient { get; }
-        public CosmosContainer GamesContainer { get; }
 
         public async Task<bool> GameExists(string gameId)
         {
-            var result = await GamesContainer.Items.ReadItemAsync<Game>(gameId, gameId);
-            return result.StatusCode == HttpStatusCode.Found;
+            var response = await _gamesContainer.Items.ReadItemAsync<Game>(gameId, gameId);
+            return response.StatusCode == HttpStatusCode.Found;
         }
 
         public async Task<Game> CreateGame(string gameId)
         {
-            await GamesContainer.Items.CreateItemAsync<Game>(gameId, new Game { GameId = gameId });
+            await _gamesContainer.Items.CreateItemAsync<Game>(gameId, new Game { GameId = gameId });
             return await GetGame(gameId);
         }
 
         public async Task<Game> GetGame(string gameId)
         {
-            CosmosItemResponse<Game> game = (await this.GamesContainer.Items.ReadItemAsync<Game>(gameId, gameId));
+            var game = await _gamesContainer.Items.ReadItemAsync<Game>(gameId, gameId);
             return game.Resource;
         }
 
@@ -45,6 +45,7 @@ namespace GameMaster
 
             var player1wins = game.Turns.Where(x => x.Player1.IsWinner).Count();
             var player2wins = game.Turns.Where(x => x.Player2.IsWinner).Count();
+
             return (player1wins >= game.NumberOfTurnsNeededToWin) || (player2wins >= game.NumberOfTurnsNeededToWin);
         }
 
@@ -56,7 +57,7 @@ namespace GameMaster
             var turns = game.Turns.ToList();
             turns.Add(new Turn { Player1 = play });
             game.Turns = turns.ToArray();
-            await GamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
+            await _gamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
             return game;
         }
 
@@ -85,7 +86,7 @@ namespace GameMaster
                 else game.WinnerPlayerId = game.Turns[0].Player2.PlayerId;
             }
 
-            await GamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
+            await _gamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
             return game;
         }
     }

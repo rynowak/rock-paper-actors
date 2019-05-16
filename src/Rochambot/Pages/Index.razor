@@ -30,13 +30,13 @@ else
     </div>
 
     <div id="game">
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Rock))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Rock))">
             <i class="fas fa-hand-rock"></i>
         </button>
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Paper))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Paper))">
             <i class="fas fa-hand-paper"></i>
         </button>
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Scissors))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Scissors))">
             <i class="fas fa-hand-scissors"></i>
         </button>
     </div>
@@ -50,9 +50,11 @@ else
     bool disabled = false;
     string winLossStatus = "normal";
 
-    protected override async Task OnInitAsync()
+    protected override Task OnInitAsync()
     {
         //await RequestGame();
+
+        return Task.CompletedTask;
     }
 
     async Task Play(Shape playerPick)

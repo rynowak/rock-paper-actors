@@ -14,7 +14,7 @@ namespace RobbyBot
     public class ShapeHandler : BackgroundService
     {
         static readonly Random Random = new Random((int)DateTime.Now.Ticks);
-        static readonly Shape[] Shapes = new Shape[] 
+        static readonly Shape[] Shapes = new Shape[]
         {
             Shape.Rock, Shape.Paper, Shape.Scissors
         };
@@ -43,8 +43,8 @@ namespace RobbyBot
                 _configuration["PlayTopic"],
                 _playerSubscriptionName);
 
-            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived, 
-                new MessageHandlerOptions(OnMessageHandlingException) 
+            _playSubscriptionClient.RegisterMessageHandler(OnMessageReceived,
+                new MessageHandlerOptions(OnMessageHandlingException)
                 {
                     AutoComplete = false,
                     MaxConcurrentCalls = 1
@@ -82,7 +82,7 @@ namespace RobbyBot
             messageToGameMaster.UserProperties["From"] = _botId;
             messageToGameMaster.UserProperties["Opponent"] = message.UserProperties["Opponent"];
             messageToGameMaster.UserProperties["Shape"] = Shapes[Random.Next(0, 2)].ToString();
-                
+
             await _playTopicClient.SendAsync(messageToGameMaster);
 
             await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
@@ -99,7 +99,7 @@ namespace RobbyBot
             _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
             _playerSubscriptionName = $"player-{_botId}";
 
-            if(!(await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _playerSubscriptionName)))
+            if (!await _managementClient.SubscriptionExistsAsync(_configuration["PlayTopic"], _playerSubscriptionName))
             {
                 await _managementClient.CreateSubscriptionAsync
                 (
