@@ -7,6 +7,7 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Rochambot;
 using Microsoft.Azure.ServiceBus.Management;
+using System.Text;
 
 namespace GameMaster
 {
@@ -15,14 +16,18 @@ namespace GameMaster
         private static string Name { get; } = "GameMaster";
         private readonly IConfiguration _configuration;
         private readonly ILogger<GameMaster> _logger;
+        private readonly GameData _gameData;
         private ManagementClient _managementClient;
         private ISubscriptionClient _playSubscriptionClient;
         private TopicClient _playTopicClient;
 
-        public GameMaster(ILogger<GameMaster> logger, IConfiguration configuration)
+        public GameMaster(ILogger<GameMaster> logger, 
+            IConfiguration configuration,
+            GameData gameData)
         {
             _configuration = configuration;
             _logger = logger;
+            _gameData = gameData;
         }
 
         public override async Task StartAsync(CancellationToken token)
@@ -58,17 +63,44 @@ namespace GameMaster
         {
             _logger.LogInformation($"Received message: {message.SystemProperties.SequenceNumber}");
 
-            // todo: save the data
-            var shape = message.UserProperties["Shape"];
-            var gameId = message.UserProperties["GameId"];
+            var shape = message.UserProperties["Shape"].ToString();
+            var gameId = message.UserProperties["GameId"].ToString();
+            var playerId = message.UserProperties["From"].ToString();
+            Game game = null;
 
+            if(!(await _gameData.GameExists(gameId)))
+                game = await _gameData.CreateGame(gameId);
+            else
+                game = await _gameData.GetGame(gameId);
+
+            if(_gameData.IsTurnComplete(game))
+            {
+                game = await _gameData.StartTurn(game.GameId, new Play
+                {
+                    PlayerId = playerId, 
+                    ShapeSelected = Enum.Parse<Shape>(shape)
+                });
+            }
+            else
+            {
+                game = await _gameData.CompleteTurn(game.GameId, new Play
+                {
+                    PlayerId = playerId, 
+                    ShapeSelected = Enum.Parse<Shape>(shape)
+                });
+            }
+
+            await ReplayOpponentPlay(message, game);
+        }
+
+        private async Task ReplayOpponentPlay(Message message, Game game)
+        {
             var messageFromGameMaster = new Message();
             messageFromGameMaster.UserProperties["GameId"] = message.UserProperties["GameId"];
             messageFromGameMaster.UserProperties["To"] = message.UserProperties["Opponent"];
             messageFromGameMaster.UserProperties["From"] = "GameMaster";
             messageFromGameMaster.UserProperties["Opponent"] = message.UserProperties["From"];
             await _playTopicClient.SendAsync(messageFromGameMaster);
-
             await _playSubscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
         }
 

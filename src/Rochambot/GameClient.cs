@@ -45,6 +45,7 @@ namespace Rochambot
             message.UserProperties["From"] = PlayerId;
             message.UserProperties["Opponent"] = Opponent.Id;
             message.UserProperties["Shape"] = playerPick.ToString();
+            message.UserProperties["GameId"] = GameId;
 
             await _playTopicClient.SendAsync(message);
             return playerPick;
