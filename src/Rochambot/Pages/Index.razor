@@ -3,7 +3,7 @@
 
 <h1>Rochambot!</h1>
 
-<p>GameId: @GameClient.Id</p>
+<p>GameId: @GameClient.GameId</p>
 <p>Status: @status</p>
 <p>BotShape: @botShape</p>
 <p>PlayerShape: @playerShape</p>
@@ -30,13 +30,13 @@ else
     </div>
 
     <div id="game">
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Rock))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Rock))">
             <i class="fas fa-hand-rock"></i>
         </button>
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Paper))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Paper))">
             <i class="fas fa-hand-paper"></i>
         </button>
-        <button type="button" class="btn btn-primary btn-lg" disabled="@disabled" onclick="@(() => Play(Shape.Scissors))">
+        <button type="button" class="btn btn-primary btn-lg" disabled=@disabled onclick="@(() => Play(Shape.Scissors))">
             <i class="fas fa-hand-scissors"></i>
         </button>
     </div>
@@ -46,14 +46,15 @@ else
 
     Shape botShape;
     Shape playerShape;
-    SessionResult sessionResult;
     string status;
     bool disabled = false;
     string winLossStatus = "normal";
 
-    protected override async Task OnInitAsync()
+    protected override Task OnInitAsync()
     {
         //await RequestGame();
+
+        return Task.CompletedTask;
     }
 
     async Task Play(Shape playerPick)
@@ -61,10 +62,7 @@ else
         playerShape = playerPick;
         status = "Waiting for bot...";
         disabled = true;
-        botShape = await GameClient.RequestShapeAsync(playerPick);
-        sessionResult = await GameClient.SendShapesToGameMasterAsync(playerShape, botShape);
-        disabled = false;
-        status = sessionResult.Summary;
+        await GameClient.PlayShapeAsync(playerPick);
     }
 
     async Task RequestGame()

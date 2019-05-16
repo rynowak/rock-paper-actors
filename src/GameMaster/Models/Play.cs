@@ -1,6 +1,8 @@
-﻿namespace Rochambot
+﻿using Rochambot;
+
+namespace GameMaster
 {
-    public class PlayerResult
+    public class Play
     {
         public string PlayerId { get; set; }
         public Shape ShapeSelected { get; set; }

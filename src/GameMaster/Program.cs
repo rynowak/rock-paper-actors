@@ -20,6 +20,10 @@ namespace GameMaster
                         options.Connect(cnStr);
                     });
                 })
-                .ConfigureServices(services => services.AddHostedService<GameMaster>());
+                .ConfigureServices(services => 
+                {
+                    services.AddHostedService<GameMaster>();
+                    services.AddSingleton<GameData>();
+                });
     }
 }
