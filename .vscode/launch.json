@@ -26,7 +26,7 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "AzureAppConfigConnectionString" : "Endpoint=https://rochambot.azconfig.io;Id=0-l1-s0:BUDHNHJhsQmqI2e6urPC;Secret=0+A8v97plBIKsYijRU3E7zg79LJZ2LctBwZOWDb/Pc8="
+                "AzureAppConfigConnectionString" : ""
             }
         },
         {
@@ -40,7 +40,7 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "AzureAppConfigConnectionString" : "Endpoint=https://rochambot.azconfig.io;Id=0-l1-s0:BUDHNHJhsQmqI2e6urPC;Secret=0+A8v97plBIKsYijRU3E7zg79LJZ2LctBwZOWDb/Pc8="
+                "AzureAppConfigConnectionString" : ""
             }
         },
         {
@@ -54,7 +54,7 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "AzureAppConfigConnectionString" : "Endpoint=https://rochambot.azconfig.io;Id=0-l1-s0:BUDHNHJhsQmqI2e6urPC;Secret=0+A8v97plBIKsYijRU3E7zg79LJZ2LctBwZOWDb/Pc8="
+                "AzureAppConfigConnectionString" : ""
             }
         },
         {
@@ -71,7 +71,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "AzureAppConfigConnectionString" : "Endpoint=https://rochambot.azconfig.io;Id=0-l1-s0:BUDHNHJhsQmqI2e6urPC;Secret=0+A8v97plBIKsYijRU3E7zg79LJZ2LctBwZOWDb/Pc8="
+                "AzureAppConfigConnectionString" : ""
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
