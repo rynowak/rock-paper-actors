@@ -7,10 +7,11 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.ServiceBus.Management;
 using System.Text;
+using Rochambot;
 
 namespace GameMaster
 {
-    public class GameMaster : BackgroundService
+    public class GameMaster : IHostedService
     {
         private const string Name = nameof(GameMaster);
         private readonly IConfiguration _configuration;
@@ -29,7 +30,7 @@ namespace GameMaster
             _gameData = gameData;
         }
 
-        public override async Task StartAsync(CancellationToken token)
+        public async Task StartAsync(CancellationToken token)
         {
             await VerifyGameMasterSubscriptionExists();
 
@@ -49,17 +50,13 @@ namespace GameMaster
                 new TopicClient(
                     _configuration["AzureServiceBusConnectionString"], 
                     _configuration["PlayTopic"]);
-
-            await base.StartAsync(token);
         }
 
-        public override async Task StopAsync(CancellationToken token)
+        public async Task StopAsync(CancellationToken token)
         {
             await _playSubscriptionClient.CloseAsync();
             await _managementClient.CloseAsync();
             await _playTopicClient.CloseAsync();
-
-            await base.StopAsync(token);
         }
 
         private async Task OnMessageReceived(Message message, CancellationToken token)
@@ -113,15 +110,6 @@ namespace GameMaster
             return Task.CompletedTask;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("GameMaster running at {time}", DateTimeOffset.Now);
-                await Task.Delay(10000);
-            }
-        }
-
         private async Task VerifyGameMasterSubscriptionExists()
         {
             _managementClient = new ManagementClient(_configuration["AzureServiceBusConnectionString"]);
@@ -130,6 +118,7 @@ namespace GameMaster
             {
                 await _managementClient.CreateSubscriptionAsync
                 (
+                    // todo: set up ttl and auto-delete on idle so the subscriptions die when unused
                     new SubscriptionDescription(_configuration["PlayTopic"], GameMaster.Name),
                     new RuleDescription($"gamemasterrule", new SqlFilter($"To = 'GameMaster'"))
                 );

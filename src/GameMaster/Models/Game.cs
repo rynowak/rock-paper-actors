@@ -9,5 +9,6 @@ namespace GameMaster
         public int NumberOfTurnsNeededToWin { get; set; } = 3; // default is best-to-3
         public Turn[] Turns { get; set; }
         public string WinnerPlayerId { get; set; }
+        public string GameArchiveState { get; set; }
     }
 }

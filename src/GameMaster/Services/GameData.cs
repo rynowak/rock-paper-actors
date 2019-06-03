@@ -10,6 +10,8 @@ namespace GameMaster
 {
     public class GameData
     {
+        private string _activeArchiveState = "active";
+        private string _archiveState = "archive01";
         private readonly IConfiguration _configuration;
         private readonly CosmosClient _cosmosClient;
         private readonly CosmosContainer _gamesContainer;
@@ -23,19 +25,19 @@ namespace GameMaster
 
         public async Task<bool> GameExists(string gameId)
         {
-            var response = await _gamesContainer.Items.ReadItemAsync<Game>(gameId, gameId);
+            var response = await _gamesContainer.Items.ReadItemAsync<Game>(_activeArchiveState, gameId);
             return response.StatusCode == HttpStatusCode.Found;
         }
 
         public async Task<Game> CreateGame(string gameId)
         {
-            await _gamesContainer.Items.CreateItemAsync<Game>(gameId, new Game { GameId = gameId });
+            await _gamesContainer.Items.CreateItemAsync<Game>(_activeArchiveState, new Game { GameId = gameId });
             return await GetGame(gameId);
         }
 
         public async Task<Game> GetGame(string gameId)
         {
-            var game = await _gamesContainer.Items.ReadItemAsync<Game>(gameId, gameId);
+            var game = await _gamesContainer.Items.ReadItemAsync<Game>(_activeArchiveState, gameId);
             return game.Resource;
         }
 
@@ -57,7 +59,7 @@ namespace GameMaster
             var turns = game.Turns.ToList();
             turns.Add(new Turn { Player1 = play });
             game.Turns = turns.ToArray();
-            await _gamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
+            await _gamesContainer.Items.ReplaceItemAsync<Game>(_activeArchiveState, gameId, game);
             return game;
         }
 
@@ -84,9 +86,16 @@ namespace GameMaster
                 var player2wins = game.Turns.Where(x => x.Player2.IsWinner).Count();
                 if(player1wins > player2wins) game.WinnerPlayerId = game.Turns[0].Player1.PlayerId;
                 else game.WinnerPlayerId = game.Turns[0].Player2.PlayerId;
+                game.GameArchiveState = _archiveState;
+                await _gamesContainer.Items.ReplaceItemAsync<Game>(_archiveState, gameId, game);
+            }
+            else
+            {
+                game.GameArchiveState = _activeArchiveState;
+                await _gamesContainer.Items.ReplaceItemAsync<Game>(_activeArchiveState, gameId, game);
             }
 
-            await _gamesContainer.Items.ReplaceItemAsync<Game>(gameId, gameId, game);
+            
             return game;
         }
     }
