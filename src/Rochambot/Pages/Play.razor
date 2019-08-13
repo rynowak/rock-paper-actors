@@ -1,0 +1,126 @@
+@page "/play"
+@inject GameClient GameClient
+@implements IDisposable
+
+<h1>Rock-Paper-Scissors</h1>
+
+@if (move is null)
+{
+    <p>Make your move...</p>
+    <div class="game">
+        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Rock))">
+            <i class="fas fa-hand-rock"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Paper))">
+            <i class="fas fa-hand-paper"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Scissors))">
+            <i class="fas fa-hand-scissors"></i>
+        </button>
+    </div>
+}
+else if (move != null && opponentMove is null)
+{
+    <p>Waiting for opponent...</p>
+    <div class="game">
+        <button type="button" class="btn @(move == Shape.Rock ? "btn-primary" : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-rock"></i>
+        </button>
+        <button type="button" class="btn @(move == Shape.Paper ? "btn-primary" : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-paper"></i>
+        </button>
+        <button type="button" class="btn @(move == Shape.Scissors ? "btn-primary" : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-scissors"></i>
+        </button>
+    </div>
+}
+else
+{
+    if (state.IsDraw.Value)
+    {
+        <p>It's a draw!</p>
+    }
+    else if (state.IsVictory(User).Value)
+    {
+        <p>You win!</p>
+    }
+    else
+    {
+        <p>You lose.</p>
+    }
+
+    <p>Your Move</p>
+    <div class="game">
+        <button type="button" class="btn @(move == Shape.Rock ? moveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-rock"></i>
+        </button>
+        <button type="button" class="btn @(move == Shape.Paper ? moveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-paper"></i>
+        </button>
+        <button type="button" class="btn @(move == Shape.Scissors ? moveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-scissors"></i>
+        </button>
+    </div>
+
+    <p>Opponent's Move</p>
+    <div class="game">
+        <button type="button" class="btn @(opponentMove == Shape.Rock ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-rock"></i>
+        </button>
+        <button type="button" class="btn @(opponentMove == Shape.Paper ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-paper"></i>
+        </button>
+        <button type="button" class="btn @(opponentMove == Shape.Scissors ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
+            <i class="fas fa-hand-scissors"></i>
+        </button>
+    </div>
+
+    <div>
+      <a href="/" class="btn btn-primary btn-lg">Play Again</a>
+    </div>
+}
+
+<hr />
+
+<p class="small text-muted">GameId: @Game?.GameId</p>
+<p class="small text-muted">Player: @Game?.Player?.Username</p>
+<p class="small text-muted">Opponent: @Game?.Opponent?.Username</p>
+
+@functions {
+    [CascadingParameter] UserInfo User { get; set; }
+    [CascadingParameter] GameInfo Game { get; set; }
+
+    CancellationTokenSource cts;
+    Shape? move;
+    Shape? opponentMove;
+    string moveClass;
+    string opponentMoveClass;
+    GameState state;
+    
+    async Task MakeMove(Shape shape)
+    {
+        if (move is null)
+        {
+            cts = new CancellationTokenSource();
+            move = shape;
+
+            await Task.Delay(TimeSpan.FromMilliseconds(750));
+            
+            state = await GameClient.PlayAsync(Game, shape, cts.Token);
+            while (!state.IsComplete)
+            {
+                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                 state = await GameClient.GetStateAsync(Game, cts.Token);
+            }
+
+            opponentMove = state.GetOpponentMove(User).Move;
+            moveClass = state.IsDraw.Value ? "btn-warning" : state.IsVictory(User).Value ? "btn-success" : "btn-danger";
+            opponentMoveClass = state.IsDraw.Value ? "btn-warning" : !state.IsVictory(User).Value  ? "btn-success" : "btn-danger";
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        cts?.Cancel();
+    }
+}

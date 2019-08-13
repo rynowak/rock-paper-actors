@@ -1,0 +1,16 @@
+@inject UserService User
+
+<EditForm Model="user" OnValidSubmit="Submit">
+    <p>Enter your username:</p>
+    <InputText @bind-Value="user.Username" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+@functions {
+    UserInfo user = new UserInfo();
+
+    void Submit()
+    {
+        User.CurrentUser = user;
+    }
+}

@@ -1,5 +1,33 @@
-﻿@*
-    The Router component displays whichever component has a @page
-    directive matching the current URI.
-*@
-<Router AppAssembly="typeof(Startup).Assembly" />
+﻿@inject UserService User
+@inject GameService Game
+@implements IDisposable
+
+<CascadingValue Value="@User.CurrentUser">
+  <CascadingValue Value="@Game.CurrentGame">
+    <Router AppAssembly="typeof(Startup).Assembly" />
+  </CascadingValue>
+</CascadingValue>
+
+@functions {
+    protected override void OnInit()
+    {
+        User.UserChanged += OnUserChanged;
+        Game.GameChanged += OnGameChanged;
+    }
+
+    void IDisposable.Dispose()
+    {
+        Game.GameChanged -= OnGameChanged;
+        User.UserChanged -= OnUserChanged;
+    }
+
+    private void OnUserChanged(object sender, UserInfo e)
+    {
+        StateHasChanged();
+    }
+
+    private void OnGameChanged(object sender, GameInfo e)
+    {
+        StateHasChanged();
+    }
+}

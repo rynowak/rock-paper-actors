@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rochambot
+namespace RobbyBot
 {
     public class GameClient
     {
@@ -18,20 +18,7 @@ namespace Rochambot
         public HttpClient HttpClient { get; set; }
         public JsonSerializerOptions Options { get; }
 
-        public async Task<GameState> GetStateAsync(GameInfo game, CancellationToken cancellationToken = default)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/game/{game.GameId}");
-
-            var response = await HttpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            using (var body = await response.Content.ReadAsStreamAsync())
-            {
-                return await JsonSerializer.DeserializeAsync<GameState>(body, Options);
-            }
-        }
-
-        public async Task<GameState> PlayAsync(GameInfo game, Shape move, CancellationToken cancellationToken = default)
+        public async Task<GameResult> PlayAsync(GameInfo game, Shape move, CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"/game/{game.GameId}");
             var bytes = JsonSerializer.SerializeToUtf8Bytes(new PlayerMove() { Player = game.Player, Move = move, }, Options);
@@ -43,7 +30,7 @@ namespace Rochambot
 
             using (var body = await response.Content.ReadAsStreamAsync())
             {
-                return await JsonSerializer.DeserializeAsync<GameState>(body, Options);
+                return await JsonSerializer.DeserializeAsync<GameResult>(body, Options);
             }
         }
     }

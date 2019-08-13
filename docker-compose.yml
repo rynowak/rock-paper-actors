@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+
+  gamemaster:
+    build:
+      context: ./src/GameMaster
+    image: rochambot/gamemaster
+
+  matchmaker:
+    build:
+      context: ./src/MatchMaker
+    image: rochambot/matchmaker
+    depends_on: 
+      - gamemaster
+
+  robbybot:
+    build:
+      context: ./src/RobbyBot
+    image: rochambot/robbybot
+    depends_on: 
+      - gamemaster
+      - matchmaker
+      
+  rochambot:
+    build:
+      context: ./src/Rochambot
+    image: rochambot/rochambot
+    depends_on: 
+      - gamemaster
+      - matchmaker
+    ports: 
+      - "5000:80"
