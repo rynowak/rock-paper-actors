@@ -54,6 +54,7 @@ namespace Rochambot
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub<App>("app");
                 endpoints.MapFallbackToPage("/_Host");
             });

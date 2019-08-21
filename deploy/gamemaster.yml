@@ -1,0 +1,40 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: gamemaster
+  labels:
+    app: gamemaster
+spec:
+  selector:
+    app: gamemaster
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamemaster
+  labels:
+    app: gamemaster
+  annotations:
+    actions.io/enabled: "true"
+    actions.io/id: "gamemaster"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gamemaster
+  template:
+    metadata:
+      labels:
+        app: gamemaster
+    spec:
+      containers:
+      - name: gamemaster
+        image: rochambot/gamemaster:latest
+        #image: rynowak.azurecr.io/rochambot/gamemaster
+        imagePullPolicy: IfNotPresent 

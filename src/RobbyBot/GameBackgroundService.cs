@@ -44,7 +44,21 @@ namespace RobbyBot
 
                 _logger.LogInformation("Waiting for game.");
 
-                var game = await _matchMakerClient.JoinGameAsync(user, stoppingToken);
+                GameInfo game;
+                try
+                {
+                    game = await _matchMakerClient.JoinGameAsync(user, stoppingToken);
+                } 
+                catch(OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("Waiting for game timed out.");
+                    continue;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error encountered while waiting for game.", ex);
+                    continue;
+                }
 
                 _logger.LogInformation("Found game {GameId} against opponent {OpponentUserName}.", game.GameId, game.Opponent.Username);
                 _work.Enqueue(PlayGame(game, stoppingToken)); // Fire and forget so we can play again concurrently.

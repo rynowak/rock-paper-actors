@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: rochambot
+  labels:
+    app: rochambot
+spec:
+  selector:
+    app: rochambot
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rochambot
+  labels:
+    app: rochambot
+  annotations:
+    actions.io/enabled: "true"
+    actions.io/id: "rochambot"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rochambot
+  template:
+    metadata:
+      labels:
+        app: rochambot
+    spec:
+      containers:
+      - name: rochambot
+        image: rochambot/rochambot
+        #image: rynowak.azurecr.io/rochambot/rochambot
+        ports:
+        - containerPort: 80
+        imagePullPolicy: IfNotPresent

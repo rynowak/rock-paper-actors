@@ -1,0 +1,40 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: matchmaker
+  labels:
+    app: matchmaker
+spec:
+  selector:
+    app: matchmaker
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchmaker
+  labels:
+    app: matchmaker
+  annotations:
+    actions.io/enabled: "true"
+    actions.io/id: "matchmaker"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matchmaker
+  template:
+    metadata:
+      labels:
+        app: matchmaker
+    spec:
+      containers:
+      - name: matchmaker
+        image: rochambot/matchmaker
+        #image: rynowak.azurecr.io/rochambot/matchmaker
+        imagePullPolicy: IfNotPresent

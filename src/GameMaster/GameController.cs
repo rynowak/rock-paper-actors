@@ -20,7 +20,6 @@ namespace GameMaster
             _logger = logger;
         }
 
-
         [HttpGet("{gameId}")]
         public async Task<ActionResult<GameState>> GetGameAsync(string gameId)
         {

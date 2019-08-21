@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: robbybot
+  labels:
+    app: robbybot
+  annotations:
+    actions.io/enabled: "true"
+    actions.io/id: "robbybot"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: robbybot
+  template:
+    metadata:
+      labels:
+        app: robbybot
+    spec:
+      containers:
+      - name: robbybot
+        #image: rynowak.azurecr.io/rochambot/robbybot
+        image: rochambot/robbybot
+        imagePullPolicy: IfNotPresent
