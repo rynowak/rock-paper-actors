@@ -23,7 +23,7 @@ namespace MatchMaker
 
         public async Task<string> CreateGameAsync(UserInfo[] players)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, "/game");
+            var request = new HttpRequestMessage(HttpMethod.Put, "create");
             var bytes = JsonSerializer.SerializeToUtf8Bytes(players, Options);
             request.Content = new ByteArrayContent(bytes);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");

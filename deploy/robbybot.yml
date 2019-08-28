@@ -19,6 +19,7 @@ spec:
     spec:
       containers:
       - name: robbybot
-        #image: rynowak.azurecr.io/rochambot/robbybot
-        image: rochambot/robbybot
-        imagePullPolicy: IfNotPresent
+        image: rynowak.azurecr.io/rochambot/robbybot:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

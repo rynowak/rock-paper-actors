@@ -33,11 +33,11 @@ namespace Rochambot
 
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["gamemaster"] ?? "http://gamemaster");
+                client.BaseAddress = new Uri(Configuration["gamemaster"] ?? "http://localhost:3500/v1.0/actions/gamemaster/");
             });
             services.AddHttpClient<MatchMakerClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["matchmaker"] ?? "http://matchmaker");
+                client.BaseAddress = new Uri(Configuration["matchmaker"] ?? "http://localhost:3500/v1.0/actions/matchmaker/");
             });
         }
 

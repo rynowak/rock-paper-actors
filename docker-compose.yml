@@ -4,19 +4,19 @@ services:
   gamemaster:
     build:
       context: ./src/GameMaster
-    image: rochambot/gamemaster
+    image: rynowak.azurecr.io/rochambot/gamemaster
 
   matchmaker:
     build:
       context: ./src/MatchMaker
-    image: rochambot/matchmaker
+    image: rynowak.azurecr.io/rochambot/matchmaker
     depends_on: 
       - gamemaster
 
   robbybot:
     build:
       context: ./src/RobbyBot
-    image: rochambot/robbybot
+    image: rynowak.azurecr.io/rochambot/robbybot
     depends_on: 
       - gamemaster
       - matchmaker
@@ -24,7 +24,7 @@ services:
   rochambot:
     build:
       context: ./src/Rochambot
-    image: rochambot/rochambot
+    image: rynowak.azurecr.io/rochambot/rochambot
     depends_on: 
       - gamemaster
       - matchmaker

@@ -27,7 +27,7 @@ namespace MatchMaker
             services.AddSingleton<PlayerQueue>();
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["gamemaster"] ?? "http://gamemaster/");
+                client.BaseAddress = new Uri(Configuration["gamemaster"] ?? "http://localhost:3500/v1.0/actions/gamemaster/");
             });
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -65,6 +65,11 @@ namespace MatchMaker
                     var queue = context.RequestServices.GetRequiredService<PlayerQueue>();
 
                     var game = await queue.GetGameAsync(gameClient, user, context.RequestAborted);
+                    if (game == null)
+                    {
+                        // Player hung up.
+                        return;
+                    }
 
                     // Signal to the current user that the game is starting
                     context.Response.Headers[HeaderNames.ContentType] = "application/json";

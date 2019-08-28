@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
@@ -45,7 +46,18 @@ namespace MatchMaker
             _logger.LogInformation("No opponent available.");
             queue.Enqueue(player);
 
-            return await player.Completion.Task;
+            try
+            {
+                using (cancellationToken.Register(() => player.Completion.TrySetCanceled(cancellationToken)))
+                {
+                    return await player.Completion.Task;
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogInformation("Player {UserName} is leaving the queue.", user.Username);
+                return null;
+            }
         }
 
         private async Task CreateGameAsync(GameClient gameClient, QueueEntry[] entries)

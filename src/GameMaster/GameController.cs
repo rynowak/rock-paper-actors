@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 namespace GameMaster
 {
     [ApiController]
-    [Route("/game")]
     public class GameController : ControllerBase
     {
         private static ConcurrentDictionary<string, GameState> _games = new ConcurrentDictionary<string, GameState>();
@@ -34,7 +33,7 @@ namespace GameMaster
             return game;
         }
 
-        [HttpPut]
+        [HttpPut("/create")]
         public async Task<ActionResult<string>> CreateGameAsync([FromBody] UserInfo[] players)
         {
             await Task.Yield();

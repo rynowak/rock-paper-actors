@@ -20,7 +20,7 @@ namespace RobbyBot
 
         public async Task<GameInfo> JoinGameAsync(UserInfo user, CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "/game");
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:3500/v1.0/actions/matchmaker/game");
             var bytes = JsonSerializer.SerializeToUtf8Bytes(user, Options);
             request.Content = new ByteArrayContent(bytes);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
