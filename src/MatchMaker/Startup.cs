@@ -36,7 +36,7 @@ namespace MatchMaker
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JsonSerializerOptions options)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JsonSerializerOptions options, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -68,12 +68,14 @@ namespace MatchMaker
                     if (game == null)
                     {
                         // Player hung up.
+                        logger.LogInformation("Player {UserId} hung up", user.Username);
                         return;
                     }
 
                     // Signal to the current user that the game is starting
                     context.Response.Headers[HeaderNames.ContentType] = "application/json";
                     await JsonSerializer.SerializeAsync(context.Response.Body, game, options);
+                    logger.LogInformation("Player {UserId} has been connected to game {GameId} ", user.Username, game.GameId);
                 });
             });
         }

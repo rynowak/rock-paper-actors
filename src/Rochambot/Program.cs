@@ -9,7 +9,6 @@ namespace Rochambot
     {
         public static void Main(string[] args)
         {
-            var listener = new TcpListener(IPAddress.Any, 80);
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,17 @@ namespace GameMaster
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
+
+            services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            });
+            
+            services.AddHttpClient<StateClient>(c =>
+            {
+                c.BaseAddress = new Uri("http://localhost:3500/v1.0/state");
             });
         }
 
