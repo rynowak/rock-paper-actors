@@ -20,9 +20,6 @@ metadata:
   name: rochambot
   labels:
     app: rochambot
-  annotations:
-    actions.io/enabled: "true"
-    actions.io/id: "rochambot"
 spec:
   replicas: 1
   selector:
@@ -32,6 +29,10 @@ spec:
     metadata:
       labels:
         app: rochambot
+      annotations:
+        actions.io/enabled: "true"
+        actions.io/id: "rochambot"
+        actions.io/port: "80"
     spec:
       containers:
       - name: rochambot

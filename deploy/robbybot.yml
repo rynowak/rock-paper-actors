@@ -4,9 +4,6 @@ metadata:
   name: robbybot
   labels:
     app: robbybot
-  annotations:
-    actions.io/enabled: "true"
-    actions.io/id: "robbybot"
 spec:
   replicas: 1
   selector:
@@ -16,6 +13,9 @@ spec:
     metadata:
       labels:
         app: robbybot
+      annotations:
+        actions.io/enabled: "true"
+        actions.io/id: "robbybot"
     spec:
       containers:
       - name: robbybot
