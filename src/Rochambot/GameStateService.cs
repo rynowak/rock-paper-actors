@@ -16,7 +16,7 @@ namespace Rochambot
             _logger = logger;
         }
 
-        public async Task<GameState> GetCompletedGameAsync(string gameId, CancellationToken cancellationToken)
+        public async Task<GameResult> GetCompletedGameAsync(string gameId, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Waiting for completion of game {GameId}", gameId);
 
@@ -40,12 +40,12 @@ namespace Rochambot
             }
         }
 
-        public void Complete(GameState state)
+        public void Complete(GameResult result)
         {
-            if (_entries.TryGetValue(state.GameId, out var entry))
+            if (_entries.TryGetValue(result.GameId, out var entry))
             {
-                _logger.LogInformation("Completing game {GameId}", state.GameId);
-                entry.Completion.TrySetResult(state);
+                _logger.LogInformation("Completing game {GameId}", result.GameId);
+                entry.Completion.TrySetResult(result);
             }
         }
 
@@ -55,12 +55,12 @@ namespace Rochambot
             {
                 GameId = gameId;
 
-                Completion = new TaskCompletionSource<GameState>();
+                Completion = new TaskCompletionSource<GameResult>();
             }
 
             public string GameId { get; }
 
-            public TaskCompletionSource<GameState> Completion { get; }
+            public TaskCompletionSource<GameResult> Completion { get; }
         }
     }
 }

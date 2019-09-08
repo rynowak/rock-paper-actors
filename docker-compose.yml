@@ -6,6 +6,11 @@ services:
       context: ./src/GameMaster
     image: rynowak.azurecr.io/rochambot/gamemaster
 
+  scoreboard:
+    build:
+      context: ./src/Scoreboard
+    image: rynowak.azurecr.io/rochambot/scoreboard
+
   matchmaker:
     build:
       context: ./src/MatchMaker
@@ -28,5 +33,6 @@ services:
     depends_on: 
       - gamemaster
       - matchmaker
+      - scoreboard
     ports: 
       - "5000:80"

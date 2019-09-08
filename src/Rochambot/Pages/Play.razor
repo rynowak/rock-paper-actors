@@ -37,11 +37,11 @@ else if (move != null && opponentMove is null)
 }
 else
 {
-    if (state.IsDraw.Value)
+    if (result.IsDraw.Value)
     {
         <p>It's a draw!</p>
     }
-    else if (state.IsVictory(User).Value)
+    else if (result.IsVictory(User).Value)
     {
         <p>You win!</p>
     }
@@ -96,7 +96,7 @@ else
     Shape? opponentMove;
     string moveClass;
     string opponentMoveClass;
-    GameState state;
+    GameResult result;
     
     async Task MakeMove(Shape shape)
     {
@@ -109,11 +109,11 @@ else
             
             var completion = GameStateService.GetCompletedGameAsync(Game.GameId, cts.Token);
             await GameClient.PlayAsync(Game, shape, cts.Token);
-            state = await completion;
+            result = await completion;
 
-            opponentMove = state.GetOpponentMove(User).Move;
-            moveClass = state.IsDraw.Value ? "btn-warning" : state.IsVictory(User).Value ? "btn-success" : "btn-danger";
-            opponentMoveClass = state.IsDraw.Value ? "btn-warning" : !state.IsVictory(User).Value  ? "btn-success" : "btn-danger";
+            opponentMove = result.GetOpponentMove(User).Move;
+            moveClass = result.IsDraw.Value ? "btn-warning" : result.IsVictory(User).Value ? "btn-success" : "btn-danger";
+            opponentMoveClass = result.IsDraw.Value ? "btn-warning" : !result.IsVictory(User).Value  ? "btn-success" : "btn-danger";
         }
     }
 

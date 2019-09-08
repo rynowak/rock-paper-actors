@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Rochambot
+namespace Scoreboard
 {
-    public class GameState
+    public class GameResult
     {
         public string GameId { get; set; }
 

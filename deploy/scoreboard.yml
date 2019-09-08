@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoreboard
+  labels:
+    app: scoreboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scoreboard
+  template:
+    metadata:
+      labels:
+        app: scoreboard
+      annotations:
+        actions.io/enabled: "true"
+        actions.io/id: "scoreboard"
+        actions.io/port: "80"
+    spec:
+      containers:
+      - name: scoreboard
+        image: rynowak.azurecr.io/rochambot/scoreboard:latest
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 80

@@ -23,10 +23,10 @@ namespace Rochambot
         }
 
         [HttpPost("/game-complete")]
-        public void Game(GameState state)
+        public void Game(GameResult result)
         {
-            _logger.LogInformation("Completing game {GameId}", state.GameId);
-            _stateService.Complete(state);
+            _logger.LogInformation("Completing game {GameId}", result.GameId);
+            _stateService.Complete(result);
         }
     }
 }

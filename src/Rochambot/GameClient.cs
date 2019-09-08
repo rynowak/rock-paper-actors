@@ -14,9 +14,9 @@ namespace Rochambot
         {
         }
 
-        public ValueTask<GameState> PlayAsync(GameInfo game, Shape move, CancellationToken cancellationToken = default)
+        public ValueTask<GameResult> PlayAsync(GameInfo game, Shape move, CancellationToken cancellationToken = default)
         {
-            return SendAsync<GameState>(HttpMethod.Post, "gamemaster", game.GameId, new PlayerMove() { Player = game.Player, Move = move, }, cancellationToken);
+            return SendAsync<GameResult>(HttpMethod.Post, "gamemaster", game.GameId, new PlayerMove() { Player = game.Player, Move = move, }, cancellationToken);
         }
     }
 }
