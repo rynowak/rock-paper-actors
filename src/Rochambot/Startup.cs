@@ -19,11 +19,18 @@ namespace Rochambot
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
+            
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
             services.AddScoped<UserService>();
             services.AddScoped<GameService>();
+            services.AddSingleton<GameStateService>();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -33,11 +40,11 @@ namespace Rochambot
 
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["gamemaster"] ?? "http://localhost:3500/v1.0/actions/gamemaster/");
+                client.BaseAddress = new Uri("http://localhost:3500");
             });
             services.AddHttpClient<MatchMakerClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["matchmaker"] ?? "http://localhost:3500/v1.0/actions/matchmaker/");
+                client.BaseAddress = new Uri("http://localhost:3500");
             });
         }
 

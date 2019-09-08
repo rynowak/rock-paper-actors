@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,25 +13,14 @@ namespace GameMaster
     public class GameController : ControllerBase
     {
         private readonly StateClient _stateClient;
+        private readonly PublishClient _publishClient;
         private readonly ILogger<GameController> _logger;
 
-        public GameController(StateClient stateClient, ILogger<GameController> logger)
+        public GameController(StateClient stateClient, PublishClient publishClient, ILogger<GameController> logger)
         {
             _stateClient = stateClient;
+            _publishClient = publishClient;
             _logger = logger;
-        }
-
-        [HttpGet("{gameId}")]
-        public async Task<ActionResult<GameState>> GetGameAsync(string gameId)
-        {
-            var game = await _stateClient.GetStateAsync<GameState>(gameId);
-            if (game == null)
-            {
-                _logger.LogInformation("Game {GameId} was not found.", gameId);
-                return NotFound();
-            }
-
-            return game;
         }
 
         [HttpPut("/create")]
@@ -48,7 +39,7 @@ namespace GameMaster
         }
 
         [HttpPost("{gameId}")]
-        public async Task<ActionResult<GameState>> PlayAsync(string gameId, PlayerMove move)
+        public async Task<ActionResult<GameState>> PlayAsync(string gameId, PlayerMove move, CancellationToken cancellationToken = default)
         {
             var game = await _stateClient.GetStateAsync<GameState>(gameId);
             if (game == null)
@@ -94,6 +85,8 @@ namespace GameMaster
                     game.Winner = game.Players[1];
                     _logger.LogInformation("Player {UserId} wins {GameId}.", game.Players[1].Username, gameId);
                 }
+
+                await _publishClient.PublishAsync("game-complete", game, cancellationToken);
             }
 
             await _stateClient.SetStateAsync(gameId, game);

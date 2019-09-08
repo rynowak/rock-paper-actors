@@ -12,6 +12,7 @@ services:
     image: rynowak.azurecr.io/rochambot/matchmaker
     depends_on: 
       - gamemaster
+      - robbybot
 
   robbybot:
     build:
@@ -19,7 +20,6 @@ services:
     image: rynowak.azurecr.io/rochambot/robbybot
     depends_on: 
       - gamemaster
-      - matchmaker
       
   rochambot:
     build:

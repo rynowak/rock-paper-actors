@@ -16,6 +16,7 @@ spec:
       annotations:
         actions.io/enabled: "true"
         actions.io/id: "robbybot"
+        actions.io/port: "80"
     spec:
       containers:
       - name: robbybot

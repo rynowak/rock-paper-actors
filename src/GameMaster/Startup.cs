@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using Microsoft.Actions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +34,12 @@ namespace GameMaster
             
             services.AddHttpClient<StateClient>(c =>
             {
-                c.BaseAddress = new Uri("http://localhost:3500/v1.0/state");
+                c.BaseAddress = new Uri("http://localhost:3500");
+            });
+
+            services.AddHttpClient<PublishClient>(c =>
+            {
+                c.BaseAddress = new Uri("http://localhost:3500");
             });
         }
 

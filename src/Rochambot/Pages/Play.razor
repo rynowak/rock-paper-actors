@@ -1,5 +1,6 @@
 @page "/play"
 @inject GameClient GameClient
+@inject GameStateService GameStateService
 @implements IDisposable
 
 <h1>Rock-Paper-Scissors</h1>
@@ -106,12 +107,9 @@ else
 
             await Task.Delay(TimeSpan.FromMilliseconds(750));
             
-            state = await GameClient.PlayAsync(Game, shape, cts.Token);
-            while (!state.IsComplete)
-            {
-                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                 state = await GameClient.GetStateAsync(Game, cts.Token);
-            }
+            var completion = GameStateService.GetCompletedGameAsync(Game.GameId, cts.Token);
+            await GameClient.PlayAsync(Game, shape, cts.Token);
+            state = await completion;
 
             opponentMove = state.GetOpponentMove(User).Move;
             moveClass = state.IsDraw.Value ? "btn-warning" : state.IsVictory(User).Value ? "btn-success" : "btn-danger";

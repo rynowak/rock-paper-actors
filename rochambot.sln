@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameMaster", "src\GameMaste
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Rochambot.Shared", "src\Rochambot.Shared\Rochambot.Shared.shproj", "{66E2A936-848D-46CB-A2C7-BF6A2C0FA608}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Actions", "src\Microsoft.Actions\Microsoft.Actions.csproj", "{6439DE8A-C9CE-4892-812A-64624430060A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Rochambot.Shared\Rochambot.Shared.projitems*{66e2a936-848d-46cb-a2c7-bf6a2c0fa608}*SharedItemsImports = 13
@@ -76,6 +78,18 @@ Global
 		{209D147B-E5A2-4757-B573-5D90B56FFBAF}.Release|x64.Build.0 = Release|Any CPU
 		{209D147B-E5A2-4757-B573-5D90B56FFBAF}.Release|x86.ActiveCfg = Release|Any CPU
 		{209D147B-E5A2-4757-B573-5D90B56FFBAF}.Release|x86.Build.0 = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|x64.Build.0 = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|x64.Build.0 = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6439DE8A-C9CE-4892-812A-64624430060A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +100,7 @@ Global
 		{61287F97-301A-4500-A18C-02D32C2A9279} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 		{209D147B-E5A2-4757-B573-5D90B56FFBAF} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 		{66E2A936-848D-46CB-A2C7-BF6A2C0FA608} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
+		{6439DE8A-C9CE-4892-812A-64624430060A} = {C96B17F5-6CBC-4C0E-999D-54731181F841}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9359A577-3D5C-40AF-AEE0-5341FBF0A194}
