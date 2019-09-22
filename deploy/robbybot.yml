@@ -17,6 +17,7 @@ spec:
         actions.io/enabled: "true"
         actions.io/id: "robbybot"
         actions.io/port: "80"
+        actions.io/config: "zipkin"
     spec:
       containers:
       - name: robbybot

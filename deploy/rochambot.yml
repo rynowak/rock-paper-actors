@@ -33,6 +33,7 @@ spec:
         actions.io/enabled: "true"
         actions.io/id: "rochambot"
         actions.io/port: "80"
+        actions.io/config: "zipkin"
     spec:
       containers:
       - name: rochambot

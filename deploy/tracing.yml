@@ -1,0 +1,11 @@
+apiVersion: actions.io/v1alpha1
+kind: Configuration
+metadata:
+  name: zipkin
+spec:
+  tracing:
+    enabled: true
+    exporterType: zipkin
+    exporterAddress: "http://zipkin.default.svc.cluster.local:9411/api/v2/spans"
+    expandParams: true
+    includeBody: true
