@@ -23,7 +23,7 @@ jobs:
     
     - name: Build GameMaster
       run: |
-        docker build src/Gamemaster --file Dockerfile --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
+        docker build src/GameMaster --file Dockerfile --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/gamemaster
         
     - name: Build MatchMaker
