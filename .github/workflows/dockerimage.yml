@@ -1,0 +1,47 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+          login-server: ${{ secrets.REGISTRY_NAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Build GameMaster
+      run: |
+        docker build src/Gamemaster --file Dockerfile --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
+        docker push rynowak.azurecr.io/rochambot/gamemaster
+        
+    - name: Build MatchMaker
+      run: |
+        docker build src/MatchMaker --file Dockerfile --tag rynowak.azurecr.io/rochambot/matchmaker:$(date +%s)
+        docker push rynowak.azurecr.io/rochambot/matchmaker
+        
+    - name: Build RobbyBot
+      run: |
+        docker build src/RobbyBot --file Dockerfile --tag rynowak.azurecr.io/rochambot/robbybot:$(date +%s)
+        docker push rynowak.azurecr.io/rochambot/robbybot
+        
+    - name: Build Rochambot
+      run: |
+        docker build src/Rochambot --file Dockerfile --tag rynowak.azurecr.io/rochambot/rochambot:$(date +%s)
+        docker push rynowak.azurecr.io/rochambot/rochambot
+        
+    - name: Build Scoreboard
+      run: |
+        docker build src/Scoreboard --file Dockerfile --tag rynowak.azurecr.io/rochambot/scoreboard:$(date +%s)
+        docker push rynowak.azurecr.io/rochambot/scoreboard
