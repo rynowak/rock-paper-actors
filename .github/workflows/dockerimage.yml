@@ -23,25 +23,25 @@ jobs:
     
     - name: Build GameMaster
       run: |
-        docker build src/GameMaster --file Dockerfile --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
+        docker build src/GameMaster --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/gamemaster
         
     - name: Build MatchMaker
       run: |
-        docker build src/MatchMaker --file Dockerfile --tag rynowak.azurecr.io/rochambot/matchmaker:$(date +%s)
+        docker build src/MatchMaker --tag rynowak.azurecr.io/rochambot/matchmaker:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/matchmaker
         
     - name: Build RobbyBot
       run: |
-        docker build src/RobbyBot --file Dockerfile --tag rynowak.azurecr.io/rochambot/robbybot:$(date +%s)
+        docker build src/RobbyBot --tag rynowak.azurecr.io/rochambot/robbybot:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/robbybot
         
     - name: Build Rochambot
       run: |
-        docker build src/Rochambot --file Dockerfile --tag rynowak.azurecr.io/rochambot/rochambot:$(date +%s)
+        docker build src/Rochambot --tag rynowak.azurecr.io/rochambot/rochambot:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/rochambot
         
     - name: Build Scoreboard
       run: |
-        docker build src/Scoreboard --file Dockerfile --tag rynowak.azurecr.io/rochambot/scoreboard:$(date +%s)
+        docker build src/Scoreboard --tag rynowak.azurecr.io/rochambot/scoreboard:$(date +%s)
         docker push rynowak.azurecr.io/rochambot/scoreboard
