@@ -14,10 +14,10 @@ spec:
       labels:
         app: gamemaster
       annotations:
-        actions.io/enabled: "true"
-        actions.io/id: "gamemaster"
-        actions.io/port: "80"
-        actions.io/config: "zipkin"
+        dapr.io/enabled: "true"
+        dapr.io/id: "gamemaster"
+        dapr.io/port: "80"
+        dapr.io/config: "zipkin"
     spec:
       containers:
       - name: gamemaster

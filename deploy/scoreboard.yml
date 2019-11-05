@@ -14,10 +14,10 @@ spec:
       labels:
         app: scoreboard
       annotations:
-        actions.io/enabled: "true"
-        actions.io/id: "scoreboard"
-        actions.io/port: "80"
-        actions.io/config: "zipkin"
+        dapr.io/enabled: "true"
+        dapr.io/id: "scoreboard"
+        dapr.io/port: "80"
+        dapr.io/config: "zipkin"
     spec:
       containers:
       - name: scoreboard

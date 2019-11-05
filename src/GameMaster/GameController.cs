@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapr;
 using Microsoft.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ namespace GameMaster
                 Moves = new List<PlayerMove>(),
             };
 
-            await _stateClient.SetStateAsync(gameId, gameState);
+            await _stateClient.SaveStateAsync(gameId, gameState);
             return "\"" + gameId + "\"";
         }
 
@@ -89,7 +90,7 @@ namespace GameMaster
                 await _publishClient.PublishAsync("game-complete", game, cancellationToken);
             }
 
-            await _stateClient.SetStateAsync(gameId, game);
+            await _stateClient.SaveStateAsync(gameId, game);
             return game;
         }
     }

@@ -19,11 +19,14 @@ namespace Rochambot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            });
+            services
+                .AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+                .AddDapr();
             
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -40,11 +43,11 @@ namespace Rochambot
 
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
             services.AddHttpClient<MatchMakerClient>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
         }
 
@@ -57,12 +60,15 @@ namespace Rochambot
 
             app.UseStaticFiles();
 
+            app.UseCloudEvents();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapSubscribeHandler();
                 endpoints.MapControllers();
-                endpoints.MapBlazorHub<App>("app");
+                endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

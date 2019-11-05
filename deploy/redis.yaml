@@ -1,19 +1,23 @@
-apiVersion: actions.io/v1alpha1
+apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: messagebus
 spec:
   type: pubsub.redis
-  connectionInfo:
-    redisHost: "redis-master.kube-system.svc.cluster.local:6379"
-    password: "WSiTDK5wjT"
+  metadata:
+  - name: redisHost
+    value: redis-master.kube-system.svc.cluster.local:6379
+  - name: redisPassword
+    value: WSiTDK5wjT
 ---
-apiVersion: actions.io/v1alpha1
+apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: statestore
 spec:
   type: state.redis
-  connectionInfo:
-    redisHost: "redis-master.kube-system.svc.cluster.local:6379"
-    redisPassword: "WSiTDK5wjT"
+  metadata:
+  - name: redisHost
+    value: redis-master.kube-system.svc.cluster.local:6379
+  - name: redisPassword
+    value: WSiTDK5wjT

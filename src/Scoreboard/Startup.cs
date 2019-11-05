@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using GameMaster;
+using Dapr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,10 +26,7 @@ namespace Scoreboard
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<StateClient>(c =>
-            {
-                c.BaseAddress = new Uri("http://localhost:3500");
-            });
+            services.AddDaprClient();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -45,17 +42,13 @@ namespace Scoreboard
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            app.UseCloudEvents();
 
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/actions/subscribe", async context =>
-                {
-                    context.Response.ContentType = "application/json";
-                    await JsonSerializer.SerializeAsync(context.Response.Body, new[] { "game-complete", }, options: options);
-                });
+                endpoints.MapSubscribeHandler();
 
                 var random = new Random();
                 endpoints.MapPost("/game-complete", async context =>
@@ -64,7 +57,8 @@ namespace Scoreboard
 
                     var game = await JsonSerializer.DeserializeAsync<GameResult>(context.Request.Body, options: options);
                     logger.LogInformation("Processing results of game {GameId}.", game.GameId);
-                });
+                })
+                .WithMetadata(new TopicAttribute("game-complete"));
             });
         }
     }

@@ -20,11 +20,14 @@ namespace GameMaster
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddJsonOptions(options =>
+            services
+                .AddControllers()
+                .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            });
+            })
+            .AddDapr();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -32,14 +35,9 @@ namespace GameMaster
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             });
             
-            services.AddHttpClient<StateClient>(c =>
+            services.AddHttpClient<PublishClient>(client =>
             {
-                c.BaseAddress = new Uri("http://localhost:3500");
-            });
-
-            services.AddHttpClient<PublishClient>(c =>
-            {
-                c.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
         }
 

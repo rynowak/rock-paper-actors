@@ -1,6 +1,6 @@
 @inject MatchMakerClient MatchMakerClient
 @inject GameService Game
-@inject IUriHelper Uri
+@inject NavigationManager Navigation
 @implements IDisposable
 
 <p>Waiting for opponent</p>
@@ -10,12 +10,12 @@
     CancellationTokenSource cts;
     [CascadingParameter] UserInfo User { get; set; }
 
-    protected async override Task OnInitAsync()
+    protected async override Task OnInitializedAsync()
     {
         cts = new CancellationTokenSource();
         var game = await MatchMakerClient.JoinGameAsync(User, cts.Token);
         Game.CurrentGame = game;
-        Uri.NavigateTo("/play");
+        Navigation.NavigateTo("/play");
     }
 
     void IDisposable.Dispose()

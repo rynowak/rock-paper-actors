@@ -25,11 +25,11 @@ namespace MatchMaker
             services.AddSingleton<PlayerQueue>();
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
             services.AddHttpClient<PublishClient>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {

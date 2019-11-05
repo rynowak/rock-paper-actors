@@ -28,7 +28,7 @@ namespace Microsoft.Actions
         {
             Logger.LogInformation("Sending message {HttpMethod} {Service}::{Operation} of type {DataType}.", httpMethod, service, operation, data?.GetType());
 
-            var url = HttpClient.BaseAddress == null ? $"http://locahost:3500/v1.0/actions/{service}/{operation}" : $"/v1.0/actions/{service}/{operation}";
+            var url = HttpClient.BaseAddress == null ? $"http://locahost:3500/v1.0/invoke/{service}/method/{operation}" : $"/v1.0/invoke/{service}/method/{operation}";
             var request = new HttpRequestMessage(httpMethod, url);
             request.Content = new ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes(data, options: Options));
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");

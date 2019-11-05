@@ -14,10 +14,10 @@ spec:
       labels:
         app: robbybot
       annotations:
-        actions.io/enabled: "true"
-        actions.io/id: "robbybot"
-        actions.io/port: "80"
-        actions.io/config: "zipkin"
+        dapr.io/enabled: "true"
+        dapr.io/id: "robbybot"
+        dapr.io/port: "80"
+        dapr.io/config: "zipkin"
     spec:
       containers:
       - name: robbybot

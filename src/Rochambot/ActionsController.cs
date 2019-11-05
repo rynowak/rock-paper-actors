@@ -1,3 +1,4 @@
+using Dapr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -16,12 +17,7 @@ namespace Rochambot
             _logger = logger;
         }
 
-        [HttpGet("[action]")]
-        public ActionResult<string[]> Subscribe()
-        {
-            return new [] { "game-complete", };
-        }
-
+        [Topic("game-complete")]
         [HttpPost("/game-complete")]
         public void Game(GameResult result)
         {

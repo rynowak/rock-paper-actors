@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using Dapr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +23,7 @@ namespace RobbyBot
         {
             services.AddHttpClient<GameClient>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:3500");
+                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
@@ -39,15 +40,13 @@ namespace RobbyBot
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCloudEvents();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/actions/subscribe", async context =>
-                {
-                    context.Response.ContentType = "application/json";
-                    await JsonSerializer.SerializeAsync(context.Response.Body, new[]{ "bot-game-starting", }, options: options);
-                });
+                endpoints.MapSubscribeHandler();
 
                 var random = new Random();
                 endpoints.MapPost("/bot-game-starting", async context =>
@@ -62,7 +61,8 @@ namespace RobbyBot
 
                     logger.LogInformation("Playing {Shape} in {GameId} against opponent {OpponentUserName}.", shape, game.GameId, game.Opponent.Username);
                     await gameClient.PlayAsync(game, shape);
-                });
+                })
+                .WithMetadata(new TopicAttribute("bot-game-starting"));
             });
         }
     }
