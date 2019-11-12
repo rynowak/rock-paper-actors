@@ -20,28 +20,41 @@ jobs:
           login-server: ${{ secrets.REGISTRY_NAME }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Helm Init
+      run: helm init --client-only
     
     - name: Build GameMaster
       run: |
-        docker build src/GameMaster --tag rynowak.azurecr.io/rochambot/gamemaster:$(date +%s)
+        TAG=$(git describe --tags)
+        docker build src/GameMaster --tag rynowak.azurecr.io/rochambot/gamemaster:$TAG
         docker push rynowak.azurecr.io/rochambot/gamemaster
+        helm package charts/gamemaster --version $TAG --app-version $TAG
         
     - name: Build MatchMaker
       run: |
-        docker build src/MatchMaker --tag rynowak.azurecr.io/rochambot/matchmaker:$(date +%s)
+        TAG=$(git describe --tags)
+        docker build src/MatchMaker --tag rynowak.azurecr.io/rochambot/matchmaker:$TAG
         docker push rynowak.azurecr.io/rochambot/matchmaker
+        helm package charts/matchmaker --version $TAG --app-version $TAG
         
     - name: Build RobbyBot
       run: |
-        docker build src/RobbyBot --tag rynowak.azurecr.io/rochambot/robbybot:$(date +%s)
+        TAG=$(git describe --tags)
+        docker build src/RobbyBot --tag rynowak.azurecr.io/rochambot/robbybot:$TAG
         docker push rynowak.azurecr.io/rochambot/robbybot
+        helm package charts/robbybot --version $TAG --app-version $TAG
         
     - name: Build Rochambot
       run: |
-        docker build src/Rochambot --tag rynowak.azurecr.io/rochambot/rochambot:$(date +%s)
+        TAG=$(git describe --tags)
+        docker build src/Rochambot --tag rynowak.azurecr.io/rochambot/rochambot:$TAG
         docker push rynowak.azurecr.io/rochambot/rochambot
+        helm package charts/rochambot --version $TAG --app-version $TAG
         
     - name: Build Scoreboard
       run: |
-        docker build src/Scoreboard --tag rynowak.azurecr.io/rochambot/scoreboard:$(date +%s)
+        TAG=$(git describe --tags)
+        docker build src/Scoreboard --tag rynowak.azurecr.io/rochambot/scoreboard:$TAG
         docker push rynowak.azurecr.io/rochambot/scoreboard
+        helm package charts/scoreboard --version $TAG --app-version $TAG

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "robbybot.fullname" . }}
+  labels:
+    app: {{ .Chart.Name }}
+{{ include "robbybot.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "robbybot.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "robbybot.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: {{ .Chart.Name }}
+        dapr.io/port: "80"
+        dapr.io/config: "zipkin"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

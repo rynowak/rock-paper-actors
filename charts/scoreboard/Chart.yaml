@@ -1,0 +1,4 @@
+apiVersion: v1
+description: scoreboard
+name: scoreboard
+version: 0.1.0
