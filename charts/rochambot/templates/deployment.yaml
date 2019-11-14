@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: {{ include "rochambot.fullname" . }}
   labels:
-    app: {{ .Chart.Name }}
 {{ include "rochambot.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -16,10 +15,6 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "rochambot.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Chart.Name }}
       annotations:
         dapr.io/enabled: "true"
         dapr.io/id: {{ .Chart.Name }}
