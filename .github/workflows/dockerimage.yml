@@ -18,6 +18,11 @@ jobs:
       uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZ_CREDS }}
+
+    - name: Kubernetes Login
+      run: |
+        az aks get-credentials --resource-group rynowak-kubo --name rynowak-kubo
+        kubectl version
       
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -27,9 +32,12 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: Helm Init
-      run: helm init --client-only
-    
-    - name: Build GameMaster
+      run: |
+        helm init --client-only
+        az acr helm repo add --name rynowak
+        helm update
+
+    - name: Publish GameMaster
       run: |
         TAG=$(git describe --tags)
         docker build src/GameMaster --tag rynowak.azurecr.io/rochambot/gamemaster:$TAG
@@ -37,7 +45,7 @@ jobs:
         helm package charts/gamemaster --version $TAG --app-version $TAG
         az acr helm push --name rynowak gamemaster-$TAG.tgz
         
-    - name: Build MatchMaker
+    - name: Publish MatchMaker
       run: |
         TAG=$(git describe --tags)
         docker build src/MatchMaker --tag rynowak.azurecr.io/rochambot/matchmaker:$TAG
@@ -45,7 +53,7 @@ jobs:
         helm package charts/matchmaker --version $TAG --app-version $TAG
         az acr helm push --name rynowak matchmaker-$TAG.tgz
         
-    - name: Build RobbyBot
+    - name: Publish RobbyBot
       run: |
         TAG=$(git describe --tags)
         docker build src/RobbyBot --tag rynowak.azurecr.io/rochambot/robbybot:$TAG
@@ -53,7 +61,7 @@ jobs:
         helm package charts/robbybot --version $TAG --app-version $TAG
         az acr helm push --name rynowak robbybot-$TAG.tgz
         
-    - name: Build Rochambot
+    - name: Publish Rochambot
       run: |
         TAG=$(git describe --tags)
         docker build src/Rochambot --tag rynowak.azurecr.io/rochambot/rochambot:$TAG
@@ -61,7 +69,7 @@ jobs:
         helm package charts/rochambot --version $TAG --app-version $TAG
         az acr helm push --name rynowak rochambot-$TAG.tgz
         
-    - name: Build Scoreboard
+    - name: Publish Scoreboard
       run: |
         TAG=$(git describe --tags)
         docker build src/Scoreboard --tag rynowak.azurecr.io/rochambot/scoreboard:$TAG
