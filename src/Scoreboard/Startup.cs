@@ -26,6 +26,8 @@ namespace Scoreboard
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddDaprClient();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
@@ -48,6 +50,8 @@ namespace Scoreboard
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/healthz");
+
                 endpoints.MapSubscribeHandler();
 
                 var random = new Random();

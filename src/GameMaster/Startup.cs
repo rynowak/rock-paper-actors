@@ -29,6 +29,8 @@ namespace GameMaster
             })
             .AddDapr();
 
+            services.AddHealthChecks();
+
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
                 PropertyNameCaseInsensitive = false,
@@ -53,6 +55,7 @@ namespace GameMaster
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/healthz");
             });
         }
     }

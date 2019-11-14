@@ -21,6 +21,8 @@ namespace RobbyBot
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddHttpClient<GameClient>(client =>
             {
                 client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
@@ -46,6 +48,7 @@ namespace RobbyBot
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/healthz");
                 endpoints.MapSubscribeHandler();
 
                 var random = new Random();

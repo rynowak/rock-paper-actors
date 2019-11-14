@@ -22,6 +22,8 @@ namespace MatchMaker
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddSingleton<PlayerQueue>();
             services.AddHttpClient<GameClient>(client =>
             {
@@ -49,6 +51,8 @@ namespace MatchMaker
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/healthz");
+
                 endpoints.MapPost("/join", async context =>
                 {
                     var user = await JsonSerializer.DeserializeAsync<UserInfo>(context.Request.Body, options);

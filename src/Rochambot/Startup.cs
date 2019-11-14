@@ -27,6 +27,8 @@ namespace Rochambot
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
                 .AddDapr();
+
+            services.AddHealthChecks();
             
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -67,6 +69,7 @@ namespace Rochambot
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapSubscribeHandler();
+                endpoints.MapHealthChecks("/healthz");
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
