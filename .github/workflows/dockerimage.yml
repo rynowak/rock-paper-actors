@@ -35,6 +35,7 @@ jobs:
         docker build src/GameMaster --tag rynowak.azurecr.io/rochambot/gamemaster:$TAG
         docker push rynowak.azurecr.io/rochambot/gamemaster
         helm package charts/gamemaster --version $TAG --app-version $TAG
+        az acr helm push --name rynowak gamemaster-$TAG.tgz
         
     - name: Build MatchMaker
       run: |
@@ -42,6 +43,7 @@ jobs:
         docker build src/MatchMaker --tag rynowak.azurecr.io/rochambot/matchmaker:$TAG
         docker push rynowak.azurecr.io/rochambot/matchmaker
         helm package charts/matchmaker --version $TAG --app-version $TAG
+        az acr helm push --name rynowak matchmaker-$TAG.tgz
         
     - name: Build RobbyBot
       run: |
@@ -49,6 +51,7 @@ jobs:
         docker build src/RobbyBot --tag rynowak.azurecr.io/rochambot/robbybot:$TAG
         docker push rynowak.azurecr.io/rochambot/robbybot
         helm package charts/robbybot --version $TAG --app-version $TAG
+        az acr helm push --name rynowak robbybot-$TAG.tgz
         
     - name: Build Rochambot
       run: |
@@ -56,6 +59,7 @@ jobs:
         docker build src/Rochambot --tag rynowak.azurecr.io/rochambot/rochambot:$TAG
         docker push rynowak.azurecr.io/rochambot/rochambot
         helm package charts/rochambot --version $TAG --app-version $TAG
+        az acr helm push --name rynowak rochambot-$TAG.tgz
         
     - name: Build Scoreboard
       run: |
@@ -63,3 +67,4 @@ jobs:
         docker build src/Scoreboard --tag rynowak.azurecr.io/rochambot/scoreboard:$TAG
         docker push rynowak.azurecr.io/rochambot/scoreboard
         helm package charts/scoreboard --version $TAG --app-version $TAG
+        az acr helm push --name rynowak scoreboard-$TAG.tgz
