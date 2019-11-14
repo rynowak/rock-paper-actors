@@ -35,7 +35,6 @@ jobs:
       run: |
         helm init --client-only
         az acr helm repo add --name rynowak
-        helm update
 
     - name: Publish GameMaster
       run: |
@@ -76,3 +75,31 @@ jobs:
         docker push rynowak.azurecr.io/rochambot/scoreboard
         helm package charts/scoreboard --version $TAG --app-version $TAG
         az acr helm push --name rynowak scoreboard-$TAG.tgz
+
+    - name: Helm Update
+      run: helm repo update
+
+    - name: Deploy GameMaster
+      run: |
+        TAG=$(git describe --tags)
+        helm upgrade gamemaster rynowak/gamemaster --version $TAG
+
+    - name: Deploy MatchMaker
+      run: |
+        TAG=$(git describe --tags)
+        helm upgrade matchmaker rynowak/matchmaker --version $TAG
+
+    - name: Deploy RobbyBot
+      run: |
+        TAG=$(git describe --tags)
+        helm upgrade robbybot rynowak/robbybot --version $TAG
+
+    - name: Deploy Rochambot
+      run: |
+        TAG=$(git describe --tags)
+        helm upgrade rochambot rynowak/rochambot --version $TAG
+
+    - name: Deploy Scoreboard
+      run: |
+        TAG=$(git describe --tags)
+        helm upgrade scoreboard rynowak/scoreboard --version $TAG
