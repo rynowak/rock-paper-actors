@@ -10,20 +10,15 @@
     UserInfo user;
     CancellationTokenSource cts = new CancellationTokenSource();
 
-    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    [Parameter] public AuthenticationState AuthenticationState { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine("PARAMS");
-        var state = await AuthenticationState;
-        if (state?.User != null)
-        {
-            Console.WriteLine("PARAMS");
-            user = new UserInfo() { Username = state.User?.FindFirst(ClaimTypes.Name)?.Value, };
-            var game = await MatchMakerClient.JoinGameAsync(user, cts.Token);
-            Game.CurrentGame = game;
-            Navigation.NavigateTo("/play");
-        }
+        user = new UserInfo() { Username = AuthenticationState.User.FindFirst(ClaimTypes.Name).Value, };
+        var game = await MatchMakerClient.JoinGameAsync(user, cts.Token);
+        Game.CurrentGame = game;
+
+        Navigation.NavigateTo("/play");
     }
 
     void IDisposable.Dispose()
