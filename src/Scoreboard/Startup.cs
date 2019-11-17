@@ -72,6 +72,9 @@ namespace Scoreboard
                     var game = await JsonSerializer.DeserializeAsync<GameResult>(context.Request.Body, options: options);
                     logger.LogInformation("Processing results of game {GameId}.", game.GameId);
 
+                    var records = await stateClient.GetStateEntryAsync<Dictionary<string, PlayerRecord>>($"records");
+                    records.Value ??= new Dictionary<string, PlayerRecord>();
+
                     for (var i = 0; i < game.Players.Length; i++)
                     {
                         var player = game.Players[i];
@@ -80,24 +83,27 @@ namespace Scoreboard
                             continue;
                         }
 
-                        var record = await stateClient.GetStateEntryAsync<PlayerRecord>($"records.{player.Username}");
-                        record.Value ??= new PlayerRecord();
+                        if (!records.Value.TryGetValue(player.Username, out var record))
+                        {
+                            record = new PlayerRecord();
+                            records.Value.Add(player.Username, record);
+                        }
 
                         if (game.IsDraw == true)
                         {
-                            record.Value.Draws++;
+                            record.Draws++;
                         }
                         else if (game.IsVictory(player) == true)
                         {
-                            record.Value.Wins++;
+                            record.Wins++;
                         }
                         else
                         {
-                            record.Value.Losses++;
+                            record.Losses++;
                         }
-
-                        await record.SaveAsync();
                     }
+
+                    await records.SaveAsync();
                 })
                 .WithMetadata(new TopicAttribute("game-complete"));
             });
