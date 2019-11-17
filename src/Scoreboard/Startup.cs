@@ -85,7 +85,7 @@ namespace Scoreboard
 
                         if (!records.Value.TryGetValue(player.Username, out var record))
                         {
-                            record = new PlayerRecord();
+                            record = new PlayerRecord() { Username = player.Username, };
                             records.Value.Add(player.Username, record);
                         }
 
