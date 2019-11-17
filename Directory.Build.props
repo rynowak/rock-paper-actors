@@ -2,4 +2,11 @@
   <PropertyGroup>
     <AspNetCoreVersion>3.0.0-preview7.19362.4</AspNetCoreVersion>
   </PropertyGroup>
+
+  <Target Name="_RemoveAnalyzer" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Analyzer Remove="%(Analyzer.Identity)" Condition="'%(Analyzer.FileName)'=='StyleCop.Analyzers'" />
+      <Analyzer Remove="%(Analyzer.Identity)" Condition="'%(Analyzer.FileName)'=='StyleCop.Analyzers.CodeFixes'" />
+    </ItemGroup>
+  </Target>
 </Project>
