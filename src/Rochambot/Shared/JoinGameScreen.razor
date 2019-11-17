@@ -4,18 +4,26 @@
 @implements IDisposable
 
 <p>Waiting for opponent</p>
-<p>Hold on a minute @User.Username ...</p>
+<p>Hold on a minute @user?.Username ...</p>
 
 @functions {
-    CancellationTokenSource cts;
-    [CascadingParameter] UserInfo User { get; set; }
+    UserInfo user;
+    CancellationTokenSource cts = new CancellationTokenSource();
 
-    protected async override Task OnInitializedAsync()
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnParametersSetAsync()
     {
-        cts = new CancellationTokenSource();
-        var game = await MatchMakerClient.JoinGameAsync(User, cts.Token);
-        Game.CurrentGame = game;
-        Navigation.NavigateTo("/play");
+        Console.WriteLine("PARAMS");
+        var state = await AuthenticationState;
+        if (state?.User != null)
+        {
+            Console.WriteLine("PARAMS");
+            user = new UserInfo() { Username = state.User?.FindFirst(ClaimTypes.Name)?.Value, };
+            var game = await MatchMakerClient.JoinGameAsync(user, cts.Token);
+            Game.CurrentGame = game;
+            Navigation.NavigateTo("/play");
+        }
     }
 
     void IDisposable.Dispose()

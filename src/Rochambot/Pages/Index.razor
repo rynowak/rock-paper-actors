@@ -2,15 +2,14 @@
 
 <h1>Rock-Paper-Scissors</h1>
 
-@if (CurrentUser == null)
-{
-    <SignInScreen />
-}
-else
-{
-    <JoinGameScreen />
-}
-
-@functions {
-    [CascadingParameter] UserInfo CurrentUser { get; set; }
-}
+<AuthorizeView>
+    <Authorized>
+        <JoinGameScreen />
+    </Authorized>
+    <Authorizing>
+        <p>Please wait...</p>
+    </Authorizing>
+    <NotAuthorized>
+        <SignInScreen />
+    </NotAuthorized>
+</AuthorizeView>

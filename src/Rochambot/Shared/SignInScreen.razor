@@ -1,4 +1,4 @@
-@inject UserService User
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <EditForm Model="user" OnValidSubmit="Submit">
     <p>Enter your username:</p>
@@ -11,6 +11,6 @@
 
     void Submit()
     {
-        User.CurrentUser = user;
+        ((NameAuthenticationStateProvider)AuthenticationStateProvider).Login(user.Username);
     }
 }

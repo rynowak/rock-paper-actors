@@ -1,7 +1,9 @@
 @page "/play"
 @inject GameClient GameClient
 @inject GameStateService GameStateService
+@inject NavigationManager Navigation
 @implements IDisposable
+@attribute [Authorize]
 
 <h1>Rock-Paper-Scissors</h1>
 
@@ -29,7 +31,7 @@ else
     {
         <p>It's a draw!</p>
     }
-    else if (result.IsVictory(User).Value)
+    else if (result.IsVictory(user).Value)
     {
         <p>You win!</p>
     }
@@ -64,15 +66,27 @@ else
 <p class="small text-muted">Opponent: @Game?.Opponent?.Username</p>
 
 @functions {
-    [CascadingParameter] UserInfo User { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
     [CascadingParameter] GameInfo Game { get; set; }
 
+    UserInfo user;
     CancellationTokenSource cts;
     Shape? move;
     Shape? opponentMove;
     string moveClass;
     string opponentMoveClass;
     GameResult result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Game == null)
+        {
+            Navigation.NavigateTo("/");
+        }
+
+        var state = await AuthenticationState;
+        user = new UserInfo() { Username = state.User.FindFirst(ClaimTypes.Name).Value, };
+    }
     
     async Task MakeMove(Shape shape)
     {
@@ -87,9 +101,9 @@ else
             await GameClient.PlayAsync(Game, shape, cts.Token);
             result = await completion;
 
-            opponentMove = result.GetOpponentMove(User).Move;
-            moveClass = result.IsDraw.Value ? "btn-warning" : result.IsVictory(User).Value ? "btn-success" : "btn-danger";
-            opponentMoveClass = result.IsDraw.Value ? "btn-warning" : !result.IsVictory(User).Value  ? "btn-success" : "btn-danger";
+            opponentMove = result.GetOpponentMove(user).Move;
+            moveClass = result.IsDraw.Value ? "btn-warning" : result.IsVictory(user).Value ? "btn-success" : "btn-danger";
+            opponentMoveClass = result.IsDraw.Value ? "btn-warning" : !result.IsVictory(user).Value  ? "btn-success" : "btn-danger";
         }
     }
 
