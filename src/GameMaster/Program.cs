@@ -23,7 +23,7 @@ namespace GameMaster
                     loggerConfiguration
                     .ReadFrom.Configuration(hostingContext.Configuration)
                     .Enrich.FromLogContext()
-                    .WriteTo.Console(formatter: new JsonFormatter());
+                    .WriteTo.Console(formatter: new JsonFormatter(renderMessage: true));
                 });
     }
 }
