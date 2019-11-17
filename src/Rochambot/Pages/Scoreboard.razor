@@ -1,0 +1,38 @@
+@page "/scoreboard"
+@inject ScoreboardClient ScoreboardClient
+
+<h3>Scoreboard</h3>
+
+@if (records == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <td>Player</td>
+                <td>Record</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in records)
+            {
+                <tr>
+                    <td>@record.Username</td>
+                    <td>@($"{record.Wins}-{record.Losses}-{record.Draws}")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@functions {
+    IEnumerable<PlayerRecord> records;
+
+    protected async override Task OnInitializedAsync()
+    {
+        records = await ScoreboardClient.GetScoreboardAsync();
+    }
+}

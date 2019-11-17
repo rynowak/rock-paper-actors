@@ -59,6 +59,10 @@ namespace Rochambot
             {
                 client.BaseAddress = new Uri($"http://localhost:{System.Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
             });
+            services.AddHttpClient<ScoreboardClient>(client =>
+            {
+                client.BaseAddress = new Uri($"http://localhost:{System.Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
