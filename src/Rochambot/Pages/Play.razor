@@ -9,30 +9,18 @@
 {
     <p>Make your move...</p>
     <div class="game">
-        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Rock))">
-            <i class="fas fa-hand-rock"></i>
-        </button>
-        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Paper))">
-            <i class="fas fa-hand-paper"></i>
-        </button>
-        <button type="button" class="btn btn-primary btn-lg" @onclick="@(() => MakeMove(Shape.Scissors))">
-            <i class="fas fa-hand-scissors"></i>
-        </button>
+        <MoveButton Shape="Shape.Rock" OnClick="@(() => MakeMove(Shape.Rock))" />
+        <MoveButton Shape="Shape.Paper" OnClick="@(() => MakeMove(Shape.Paper))" />
+        <MoveButton Shape="Shape.Scissors" OnClick="@(() => MakeMove(Shape.Scissors))" />
     </div>
 }
 else if (move != null && opponentMove is null)
 {
     <p>Waiting for opponent...</p>
     <div class="game">
-        <button type="button" class="btn @(move == Shape.Rock ? "btn-primary" : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-rock"></i>
-        </button>
-        <button type="button" class="btn @(move == Shape.Paper ? "btn-primary" : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-paper"></i>
-        </button>
-        <button type="button" class="btn @(move == Shape.Scissors ? "btn-primary" : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-scissors"></i>
-        </button>
+        <MoveButton Shape="Shape.Rock" MoveClass="@(move == Shape.Rock ? "btn-primary" : "btn-secondary")" />
+        <MoveButton Shape="Shape.Paper" MoveClass="@(move == Shape.Paper ? "btn-primary" : "btn-secondary")" />
+        <MoveButton Shape="Shape.Scissors" MoveClass="@(move == Shape.Scissors ? "btn-primary" : "btn-secondary")" />
     </div>
 }
 else
@@ -52,28 +40,16 @@ else
 
     <p>Your Move</p>
     <div class="game">
-        <button type="button" class="btn @(move == Shape.Rock ? moveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-rock"></i>
-        </button>
-        <button type="button" class="btn @(move == Shape.Paper ? moveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-paper"></i>
-        </button>
-        <button type="button" class="btn @(move == Shape.Scissors ? moveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-scissors"></i>
-        </button>
+        <MoveButton Shape="Shape.Rock" MoveClass="@(move == Shape.Rock ? moveClass : "btn-secondary")" />
+        <MoveButton Shape="Shape.Paper" MoveClass="@(move == Shape.Paper ? moveClass : "btn-secondary")" />
+        <MoveButton Shape="Shape.Scissors" MoveClass="@(move == Shape.Scissors ? moveClass : "btn-secondary")" />
     </div>
 
     <p>Opponent's Move</p>
     <div class="game">
-        <button type="button" class="btn @(opponentMove == Shape.Rock ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-rock"></i>
-        </button>
-        <button type="button" class="btn @(opponentMove == Shape.Paper ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-paper"></i>
-        </button>
-        <button type="button" class="btn @(opponentMove == Shape.Scissors ? opponentMoveClass : "btn-secondary") btn-lg" disabled>
-            <i class="fas fa-hand-scissors"></i>
-        </button>
+        <MoveButton Shape="Shape.Rock" MoveClass="@(opponentMove == Shape.Rock ? opponentMoveClass : "btn-secondary")" />
+        <MoveButton Shape="Shape.Paper" MoveClass="@(opponentMove == Shape.Paper ? opponentMoveClass : "btn-secondary")" />
+        <MoveButton Shape="Shape.Scissors" MoveClass="@(opponentMove == Shape.Scissors ? opponentMoveClass : "btn-secondary")" />
     </div>
 
     <div>

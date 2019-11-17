@@ -1,0 +1,22 @@
+<button type="button" class="btn @MoveClass btn-lg" @onclick="@OnClick" disabled="@(!OnClick.HasDelegate)">
+    <i class="fas @GetGlyph()"></i>
+</button>
+
+@functions {
+    [Parameter] public Shape Shape { get; set; }
+
+    [Parameter] public string MoveClass { get; set; } = "btn-primary";
+
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    string GetGlyph()
+    {
+        return Shape switch
+        {
+            Shape.Rock => "fa-hand-rock",
+            Shape.Scissors => "fa-hand-scissors",
+            Shape.Paper => "fa-hand-paper",
+            _ => throw new InvalidOperationException("Unknown shape"),
+        };
+    }
+}
