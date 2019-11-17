@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Formatting.Json;
 
 namespace GameMaster
 {
@@ -15,6 +17,13 @@ namespace GameMaster
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .UseSerilog((hostingContext, loggerConfiguration) => 
+                {
+                    loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(formatter: new JsonFormatter());
                 });
     }
 }

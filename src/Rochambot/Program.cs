@@ -1,7 +1,7 @@
-using System.Net;
-using System.Net.Sockets;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Formatting.Json;
 
 namespace Rochambot
 {
@@ -12,8 +12,18 @@ namespace Rochambot
             CreateHostBuilder(args).Build().Run();
         }
 
-        static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
+                .UseSerilog((hostingContext, loggerConfiguration) => 
+                {
+                    loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(formatter: new JsonFormatter());
+                });
     }
 }   
