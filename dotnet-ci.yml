@@ -1,0 +1,20 @@
+trigger:
+- master
+- release/*
+- feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install dotnet SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '3.0.100'
+    includePreviewVersions: true
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    command: 'build'
+    projects: 'rochambot.sln'
