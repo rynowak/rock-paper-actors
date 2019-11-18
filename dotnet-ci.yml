@@ -27,3 +27,13 @@ steps:
   inputs:
     command: 'build'
     projects: 'rochambot.sln'
+
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+    releaseType: 'edge'
+
+- task: Docker@2
+  inputs:
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
