@@ -30,6 +30,11 @@ jobs:
           login-server: ${{ secrets.REGISTRY_NAME }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Helm tool installer
+      uses: Azure/setup-helm@v1 
+      with:
+        version: 3.0.0
 
     - name: Helm Init
       run: |
