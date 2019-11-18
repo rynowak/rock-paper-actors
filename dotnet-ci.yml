@@ -34,6 +34,9 @@ steps:
     dockerVersion: '17.09.0-ce'
     releaseType: 'edge'
 
+- bash: |
+    docker login -u ${{ variables.DOCKER_USERNAME }} -p ${{ variables.DOCKER_PASSWORD }} https://rynowak.azurecr.io
+
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
