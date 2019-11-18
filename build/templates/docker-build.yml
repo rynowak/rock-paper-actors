@@ -1,0 +1,9 @@
+parameters:
+  context: ''
+  image: ''
+  repository: ''
+
+steps:
+  - bash: |
+      TAG=$(git describe --tags)
+      docker build ${{ parameters.context }} --tag ${{ parameters.repository }}/${{ parameters.image }}:$TAG

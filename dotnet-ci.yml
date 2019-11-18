@@ -22,6 +22,7 @@ steps:
     packageType: 'sdk'
     version: '3.0.100'
     includePreviewVersions: true
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
@@ -33,7 +34,32 @@ steps:
     dockerVersion: '17.09.0-ce'
     releaseType: 'edge'
 
-- task: Docker@2
-  inputs:
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'gamemaster'
+    context: 'src/GameMaster'
+
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'matchmaker'
+    context: 'src/MatchMaker'
+
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'robbybot'
+    context: 'src/RobbyBot'
+
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'rochambot'
+    context: 'src/Rochambot'
+
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'scoreboard'
+    context: 'src/Scoreboard'
