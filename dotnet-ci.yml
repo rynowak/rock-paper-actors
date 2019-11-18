@@ -35,7 +35,7 @@ steps:
     releaseType: 'edge'
 
 - bash: |
-    docker login -u ${{ variables.DOCKER_USERNAME }} -p ${{ variables.DOCKER_PASSWORD }} https://rynowak.azurecr.io
+    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD https://rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
