@@ -40,6 +40,10 @@ steps:
 - bash: |
     az acr login --name rynowak
 
+- bash: |
+    helm init --client-only
+    az acr helm repo add --name rynowak
+
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'

@@ -7,3 +7,6 @@ steps:
   - bash: |
       TAG=$(git describe --tags)
       docker build ${{ parameters.context }} --tag ${{ parameters.repository }}/${{ parameters.image }}:$TAG
+      docker push ${{ parameters.repository}}/${{ parameters.image }}
+      helm package charts/${{ parameters.image }} --version $TAG --app-version $TAG
+      az acr helm push --name rynowak ${{ parameters.image }}-$TAG.tgz
