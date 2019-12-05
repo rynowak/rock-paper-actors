@@ -38,7 +38,7 @@ steps:
     az login --service-principal --username $(AZ_APPID) --password $(AZ_PASSWORD) --tenant $(AZ_TENANTID)
 
 - bash: |
-    docker login -u '$(DOCKER_USERNAME)' -p '$(DOCKER_PASSWORD)' https://rynowak.azurecr.io
+    az acr login --name rynowak
 
 - template: build/templates/docker-build.yml
   parameters:
