@@ -34,6 +34,10 @@ steps:
     dockerVersion: '17.09.0-ce'
     releaseType: 'edge'
 
+- task: HelmInstaller@1
+  inputs:
+    helmVersionToInstall: 'latest'
+
 - bash: |
     az login --service-principal --username $(AZ_APPID) --password $(AZ_PASSWORD) --tenant $(AZ_TENANTID)
 
