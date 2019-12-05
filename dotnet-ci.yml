@@ -35,10 +35,10 @@ steps:
     releaseType: 'edge'
 
 - bash: |
-    az login --service-principal --username ${{ secrets.AZ_APPID }} --password ${{ secrets.AZ_PASSWORD }} --tenant ${{ secrets.AZ_TENANTID }}
+    az login --service-principal --username $(AZ_APPID) --password $(AZ_PASSWORD) --tenant $(AZ_TENANTID)
 
 - bash: |
-    docker login -u ${{ secrets.DOCKER_USERNAME }} -p {{ secrets.DOCKER_PASSWORD }} https://rynowak.azurecr.io
+    docker login -u '$(DOCKER_USERNAME)' -p '$(DOCKER_PASSWORD)' https://rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
