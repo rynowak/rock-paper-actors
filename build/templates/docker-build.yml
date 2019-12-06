@@ -2,11 +2,24 @@ parameters:
   context: ''
   image: ''
   repository: ''
+  serviceConnection: ''
 
 steps:
-  - bash: |
-      TAG=$(git describe --tags)
-      docker build ${{ parameters.context }} --tag ${{ parameters.repository }}/${{ parameters.image }}:$TAG
-      docker push ${{ parameters.repository}}/${{ parameters.image }}
-      helm package charts/${{ parameters.image }} --version $TAG --app-version $TAG
-      az acr helm push --name rynowak ${{ parameters.image }}-$TAG.tgz
+- task: Docker@2
+  displayName: Docker Build and Push ${{ parameters.image }}
+  inputs:
+    command: buildAndPush
+    buildContext: ${{ parameters.context }}
+    Dockerfile: "${{ parameters.context }}/Dockerfile"
+    repository: rochambot/${{ parameters.image }}
+    containerRegistry: ${{ parameters.serviceConnection }}
+    tags: $(Build.BuildNumber)
+
+- task: HelmDeploy@0
+  displayName: Helm Package ${{ parameters.image }}
+  inputs:
+    command: package
+    chartPath: charts/${{ parameters.image }}
+    destination: $(Build.ArtifactStagingDirectory)
+    version: $(Build.BuildNumber)
+    save: false

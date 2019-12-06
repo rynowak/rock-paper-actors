@@ -16,6 +16,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- bash: |
+    echo "##vso[build.updatebuildnumber]$(git describe --tags)" 
+
 - task: UseDotNet@2
   displayName: 'Install dotnet SDK'
   inputs:
@@ -44,36 +47,46 @@ steps:
 - bash: |
     az acr login --name rynowak
 
+- task: Docker@2
+  displayName: Login to ACR
+  inputs:
+    command: login
+    containerRegistry: rynowak.azurecr.io
+
 - bash: |
-    helm init --client-only
-    az acr helm repo add --name rynowak
+    helm init
 
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
     image: 'gamemaster'
     context: 'src/GameMaster'
+    serviceConnection: rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
     image: 'matchmaker'
     context: 'src/MatchMaker'
+    serviceConnection: rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
     image: 'robbybot'
     context: 'src/RobbyBot'
+    serviceConnection: rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
     image: 'rochambot'
     context: 'src/Rochambot'
+    serviceConnection: rynowak.azurecr.io
 
 - template: build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
     image: 'scoreboard'
     context: 'src/Scoreboard'
+    serviceConnection: rynowak.azurecr.io
