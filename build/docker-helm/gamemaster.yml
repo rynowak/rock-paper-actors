@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+    - master
+    - release/*
+    - feature/*
+
+pr:
+  branches:
+    include:
+    - master
+    - release/*
+    - feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- bash: |
+    echo "##vso[build.updatebuildnumber]$(git describe --tags)"
+
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+    releaseType: 'edge'
+
+- task: Docker@2
+  displayName: Login to ACR
+  inputs:
+    command: login
+    containerRegistry: rynowak.azurecr.io
+
+- task: HelmInstaller@1
+  inputs:
+    helmVersionToInstall: 'latest'
+
+- template: build/templates/docker-build.yml
+  parameters:
+    repository: 'rynowak.azurecr.io/rochambot'
+    image: 'gamemaster'
+    context: 'src/GameMaster'
+    serviceConnection: rynowak.azurecr.io
