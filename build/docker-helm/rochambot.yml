@@ -10,8 +10,8 @@ trigger:
   paths:
     include:
     - build/*
-    - charts/gamemaster/*
-    - src/GameMaster/*
+    - charts/rochambot/*
+    - src/Rochambot/*
     - Directory.Build.props
 
 pr:
@@ -31,6 +31,6 @@ steps:
 - template: ${{variables['System.DefaultWorkingDirectory']}}/build/templates/docker-build.yml
   parameters:
     repository: 'rynowak.azurecr.io/rochambot'
-    image: 'gamemaster'
-    context: 'src/GameMaster'
+    image: 'rochambot'
+    context: 'src/Rochambot'
     serviceConnection: rynowak.azurecr.io
