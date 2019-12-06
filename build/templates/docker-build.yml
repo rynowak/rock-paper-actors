@@ -35,6 +35,12 @@ steps:
   inputs:
     command: package
     chartPath: charts/${{ parameters.image }}
-    destination: $(Build.ArtifactStagingDirectory)
+    destination: $(Build.ArtifactStagingDirectory)/charts
     version: $(Build.BuildNumber)
     save: false
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Charts to Artifacts
+  inputs:
+    pathToPublish: $(Build.ArtifactStagingDirectory)/charts
+    artifactName: charts
