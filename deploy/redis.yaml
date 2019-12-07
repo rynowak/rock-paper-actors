@@ -6,9 +6,13 @@ spec:
   type: pubsub.redis
   metadata:
   - name: redisHost
-    value: redis-master.kube-system.svc.cluster.local:6379
+    value: rynowak-redis.redis.cache.windows.net:6379
   - name: redisPassword
-    value: WSiTDK5wjT
+    secretKeyRef:
+      name: dapr-redis-secret
+      key: redis-password
+auth:
+  secretStore: kubernetes
 ---
 apiVersion: dapr.io/v1alpha1
 kind: Component
@@ -18,6 +22,10 @@ spec:
   type: state.redis
   metadata:
   - name: redisHost
-    value: redis-master.kube-system.svc.cluster.local:6379
+    value: rynowak-redis.redis.cache.windows.net:6379
   - name: redisPassword
-    value: WSiTDK5wjT
+    secretKeyRef:
+      name: dapr-redis-secret
+      key: redis-password
+auth:
+  secretStore: kubernetes

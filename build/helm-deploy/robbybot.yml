@@ -4,7 +4,7 @@ pr: none
 resources: 
   pipelines:
   - pipeline: ci-pipeline
-    source: gamemaster-docker-helm
+    source: robbybot-docker-helm
     trigger:
       branches: 
         include:  
@@ -14,7 +14,7 @@ resources:
 
 jobs:
 - deployment: development
-  displayName: Helm Upgrade gamemaster
+  displayName: Helm Upgrade robbybot
   pool:
     vmImage: 'ubuntu-latest'
   environment: development
@@ -24,6 +24,6 @@ jobs:
         steps:
         - template: ${{variables['System.DefaultWorkingDirectory']}}/build/templates/helm-deploy.yml
           parameters:
-            chart: 'gamemaster'
-            releaseName: 'gamemaster'
+            chart: 'robbybot'
+            releaseName: 'robbybot'
             serviceConnection: rynowak-kubot
