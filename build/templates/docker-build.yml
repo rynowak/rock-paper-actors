@@ -37,6 +37,7 @@ steps:
     chartPath: charts/${{ parameters.image }}
     destination: $(Build.ArtifactStagingDirectory)/charts
     version: $(Build.BuildNumber)
+    arguments: --app-version $(Build.BuildNumber)
     save: false
 
 - task: PublishBuildArtifacts@1
