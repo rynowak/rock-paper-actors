@@ -1,0 +1,30 @@
+trigger: none
+pr: none
+
+resources: 
+  pipelines:
+  - pipeline: gamemaster-docker-helm
+    source: gamemaster-docker-helm
+    trigger:
+      branches: 
+        include:  
+          - master
+          - release/*
+          - feature/*
+
+jobs:
+- deployment: development
+  displayName: Helm Upgrade gamemaster
+  pool:
+    vmImage: 'ubuntu-latest'
+  environment: development
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - template: ${{variables['System.DefaultWorkingDirectory']}}/build/templates/helm-deploy.yml
+          parameters:
+            repository: 'rynowak.azurecr.io/rochambot'
+            image: 'gamemaster'
+            context: 'src/GameMaster'
+            serviceConnection: rynowak.azurecr.io

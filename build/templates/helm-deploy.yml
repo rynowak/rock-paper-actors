@@ -1,0 +1,21 @@
+parameters:
+  context: ''
+  image: ''
+  repository: ''
+  serviceConnection: ''
+
+steps:
+- checkout: none
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    preferTriggeringPipeline: true
+    artifact: charts
+    path: charts/
+
+- task: HelmInstaller@1
+  inputs:
+    helmVersionToInstall: 'latest'
+
+- bash: |
+    ls charts/
