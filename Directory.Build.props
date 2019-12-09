@@ -1,8 +1,2 @@
 <Project>
-  <Target Name="_RemoveAnalyzer" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <Analyzer Remove="%(Analyzer.Identity)" Condition="'%(Analyzer.FileName)'=='StyleCop.Analyzers'" />
-      <Analyzer Remove="%(Analyzer.Identity)" Condition="'%(Analyzer.FileName)'=='StyleCop.Analyzers.CodeFixes'" />
-    </ItemGroup>
-  </Target>
 </Project>
