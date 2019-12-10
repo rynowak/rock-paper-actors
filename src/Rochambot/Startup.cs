@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Prometheus;
 
 namespace Rochambot
 {
@@ -71,6 +72,9 @@ namespace Rochambot
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseHttpMetrics();
+            app.UseMetricServer();
 
             app.UseStaticFiles();
 

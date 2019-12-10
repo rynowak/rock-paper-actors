@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rochambot-service-monitor
+  namespace: monitoring
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rochambot
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - path: /metrics
+    port: http
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: gamemaster
+  namespace: monitoring
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gamemaster
+  namespaceSelector:
+    matchNames:
+    - default
+  podMetricsEndpoints:
+  - path: /metrics
+    port: "80"
+    interval: 30s
