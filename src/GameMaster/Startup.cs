@@ -1,6 +1,4 @@
-using System;
 using System.Text.Json;
-using Microsoft.Actions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,20 +25,15 @@ namespace GameMaster
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             })
-            .AddDapr();
+            .AddDapr(client =>
+            {
+                var options = new JsonSerializerOptions();
+                options.PropertyNameCaseInsensitive = true;
+                options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                client.UseJsonSerializationOptions(options);
+            });
 
             services.AddHealthChecks();
-
-            services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = false,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
-            
-            services.AddHttpClient<PublishClient>(client =>
-            {
-                client.BaseAddress = new Uri($"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"}");
-            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

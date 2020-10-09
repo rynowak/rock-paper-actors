@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapr;
+using Dapr.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,7 +29,14 @@ namespace Scoreboard
         {
             services.AddHealthChecks();
             
-            services.AddDaprClient();
+            services.AddDaprClient(client =>
+            {
+                client.UseJsonSerializationOptions(new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = false,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
+            });
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -56,9 +64,9 @@ namespace Scoreboard
 
                 endpoints.MapGet("/get-stats", async context =>
                 {
-                    var stateClient = context.RequestServices.GetRequiredService<StateClient>();
+                    var stateClient = context.RequestServices.GetRequiredService<DaprClient>();
 
-                    var records = await stateClient.GetStateAsync<Dictionary<string, PlayerRecord>>("records");
+                    var records = await stateClient.GetStateAsync<Dictionary<string, PlayerRecord>>("statestore", "records");
 
                     context.Response.ContentType = "application/json";
                     await JsonSerializer.SerializeAsync(context.Response.Body, records, options: options);
@@ -67,12 +75,12 @@ namespace Scoreboard
                 var random = new Random();
                 endpoints.MapPost("/game-complete", async context =>
                 {
-                    var stateClient = context.RequestServices.GetRequiredService<StateClient>();
+                    var stateClient = context.RequestServices.GetRequiredService<DaprClient>();
 
                     var game = await JsonSerializer.DeserializeAsync<GameResult>(context.Request.Body, options: options);
                     logger.LogInformation("Processing results of game {GameId}.", game.GameId);
 
-                    var records = await stateClient.GetStateEntryAsync<Dictionary<string, PlayerRecord>>($"records");
+                    var records = await stateClient.GetStateEntryAsync<Dictionary<string, PlayerRecord>>("statestore", "records");
                     records.Value ??= new Dictionary<string, PlayerRecord>();
 
                     for (var i = 0; i < game.Players.Length; i++)
@@ -105,7 +113,7 @@ namespace Scoreboard
 
                     await records.SaveAsync();
                 })
-                .WithMetadata(new TopicAttribute("game-complete"));
+                .WithMetadata(new TopicAttribute("pubsub", "game-complete"));
             });
         }
     }

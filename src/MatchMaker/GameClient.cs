@@ -1,22 +1,22 @@
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Actions;
-using Microsoft.Extensions.Logging;
+using Dapr.Client;
+using Dapr.Client.Http;
 
 namespace MatchMaker
 {
-    public class GameClient : ServiceClient
+    public class GameClient
     {
-        public GameClient(HttpClient httpClient, JsonSerializerOptions options, ILoggerFactory loggerFactory)
-            : base(httpClient, options, loggerFactory)
+        private readonly DaprClient client;
+        public GameClient(DaprClient client)
         {
+            this.client = client;
         }
 
         public ValueTask<string> CreateGameAsync(UserInfo[] players, CancellationToken cancellationToken = default)
         {
-            return SendAsync<string>(HttpMethod.Put, "gamemaster", "create", players, cancellationToken);
+            return client.InvokeMethodAsync<UserInfo[], string>("gamemaster", "create", players, new HTTPExtension(){ Verb = HTTPVerb.Put, }, cancellationToken);
         }
     }
 }

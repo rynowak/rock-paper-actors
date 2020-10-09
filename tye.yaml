@@ -1,0 +1,37 @@
+# tye application configuration file
+# read all about it at https://github.com/dotnet/tye
+#
+# when you've given us a try, we'd love to know what you think:
+#    https://aka.ms/AA7q20u
+#
+name: rock-paper-actors
+extensions:
+- name: dapr
+  components-path: "./components/"
+services:
+- name: botplayer
+  project: src/BotPlayer/BotPlayer.csproj
+- name: frontend
+  project: src/Frontend/Frontend.csproj
+- name: gamemaster
+  project: src/GameMaster/GameMaster.csproj
+- name: matchmaker
+  project: src/MatchMaker/MatchMaker.csproj
+- name: scoreboard
+  project: src/Scoreboard/Scoreboard.csproj
+
+# This may conflict with the redis instance that dapr manages.
+#
+# Doing a `docker ps` can show if its already running. If that's the case
+# then comment out out when running locally. 
+# - name: redis
+#   image: redis
+#   bindings: 
+#   - port: 6379
+# To ensure that your are running a dapr placement container with the right binding port.
+# (50005 as HostPort)
+# - name: placement
+#   image: daprio/dapr
+#   args: ./placement
+#   bindings:
+#     - port: 50005

@@ -1,14 +1,14 @@
 using System;
 using System.Text.Json;
+using Dapr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 
-namespace MatchMaker
+namespace BotPlayer
 {
     public class Startup
     {
@@ -22,17 +22,16 @@ namespace MatchMaker
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
-
             services.AddDaprClient(client =>
             {
-                var options = new JsonSerializerOptions();
-                options.PropertyNameCaseInsensitive = true;
-                options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                client.UseJsonSerializationOptions(options);
+                client.UseJsonSerializationOptions(new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = false,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
             });
-
+            
             services.AddSingleton<GameClient>();
-            services.AddSingleton<PlayerQueue>();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -48,32 +47,30 @@ namespace MatchMaker
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCloudEvents();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHealthChecks("/healthz");
+                endpoints.MapSubscribeHandler();
 
-                endpoints.MapPost("/join", async context =>
+                var random = new Random();
+                endpoints.MapPost("/bot-game-starting", async context =>
                 {
-                    var user = await JsonSerializer.DeserializeAsync<UserInfo>(context.Request.Body, options);
-
                     var gameClient = context.RequestServices.GetRequiredService<GameClient>();
-                    var queue = context.RequestServices.GetRequiredService<PlayerQueue>();
 
-                    var game = await queue.GetGameAsync(gameClient, user, context.RequestAborted);
-                    if (game == null)
-                    {
-                        // Player hung up.
-                        logger.LogInformation("Player {UserId} hung up", user.Username);
-                        return;
-                    }
+                    var game = await JsonSerializer.DeserializeAsync<GameInfo>(context.Request.Body, options: options);
+                    logger.LogInformation("Joined game {GameId}.", game.GameId);
 
-                    // Signal to the current user that the game is starting
-                    context.Response.Headers[HeaderNames.ContentType] = "application/json";
-                    await JsonSerializer.SerializeAsync(context.Response.Body, game, options);
-                    logger.LogInformation("Player {UserId} has been connected to game {GameId} ", user.Username, game.GameId);
-                });
+                    // There's no need to observe the results of the game, just make a move.
+                    var shape = (Shape)random.Next(3);
+
+                    logger.LogInformation("Playing {Shape} in {GameId} against opponent {OpponentUserName}.", shape, game.GameId, game.Opponent.Username);
+                    await gameClient.PlayAsync(game, shape);
+                })
+                .WithMetadata(new TopicAttribute("pubsub", "bot-game-starting"));
             });
         }
     }

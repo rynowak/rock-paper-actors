@@ -1,0 +1,72 @@
+@inject MatchMakerClient MatchMakerClient
+@inject GameService Game
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<p>Waiting for opponent</p>
+<p>Hold on a minute @user?.Username ...</p>
+
+@functions {
+    UserInfo user;
+    CancellationTokenSource cts;
+
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // If the user changes, then cancel an outstanding request to join
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
+        user = null;
+
+        var name = GetUsername(await AuthenticationState);
+        if (name is null)
+        {
+            return;
+        }
+        
+        user = new UserInfo() { Username = name, };
+        StateHasChanged();
+
+        var joined = await TryJoinGameAsync();
+        if (joined)
+        {
+            Navigation.NavigateTo("/play");
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        cts?.Cancel();
+    }
+
+    string GetUsername(AuthenticationState auth)
+    {
+        if (auth.User is null)
+        {
+            return null;
+        }
+
+        var name = auth.User.FindFirst(ClaimTypes.Name)?.Value;
+        if (name is null)
+        {
+            return null; 
+        }
+
+        return name;
+    }
+
+    async Task<bool> TryJoinGameAsync()
+    {
+        try
+        {
+            var game = await MatchMakerClient.JoinGameAsync(user, cts.Token);
+            Game.CurrentGame = game;
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+    }
+}
