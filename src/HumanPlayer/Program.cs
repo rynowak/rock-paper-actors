@@ -1,13 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Dapr.Actors.AspNetCore;
 using Dapr.Actors.Runtime;
+using Dapr.Client;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Formatting.Json;
 
-namespace GameMaster
+namespace HumanPlayer
 {
     public class Program
     {
@@ -21,7 +27,7 @@ namespace GameMaster
                 .ConfigureServices(services =>
                 {
                     services.AddDaprClient();
-                    services.RegisterActorWithDI<GameActor>();
+                    services.RegisterActorWithDI<HumanPlayerActor>();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

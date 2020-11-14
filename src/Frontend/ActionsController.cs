@@ -1,6 +1,7 @@
 using Dapr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Player;
 
 namespace Frontend
 {
@@ -17,11 +18,17 @@ namespace Frontend
             this.logger = logger;
         }
 
+        [Topic("pubsub", "game-ready")]
+        [HttpPost("/game-ready")]
+        public void GameComplete(GameInfo game)
+        {
+            stateService.Complete(game);
+        }
+
         [Topic("pubsub", "game-complete")]
         [HttpPost("/game-complete")]
-        public void Game(GameResult result)
+        public void GameComplete(GameResult result)
         {
-            logger.LogInformation("Completing game {GameId}", result.GameId);
             stateService.Complete(result);
         }
     }

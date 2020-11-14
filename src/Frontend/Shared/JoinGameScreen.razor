@@ -1,4 +1,4 @@
-@inject MatchMakerClient MatchMakerClient
+@inject GameStateService GameStateService
 @inject GameService Game
 @inject NavigationManager Navigation
 @implements IDisposable
@@ -60,7 +60,12 @@
     {
         try
         {
-            var game = await MatchMakerClient.JoinGameAsync(user, cts.Token);
+            var ready = GameStateService.GetReadyGameAsync(user.Username, cts.Token);
+
+            var proxy = ActorProxy.Create<IHumanPlayerActor>(new ActorId(user.Username), "HumanPlayerActor");
+            await proxy.RequestGameAsync();
+
+            var game = await ready;
             Game.CurrentGame = game;
             return true;
         }

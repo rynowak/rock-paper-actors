@@ -15,6 +15,8 @@ services:
   project: src/Frontend/Frontend.csproj
 - name: gamemaster
   project: src/GameMaster/GameMaster.csproj
+- name: humanplayer
+  project: src/HumanPlayer/HumanPlayer.csproj
 - name: matchmaker
   project: src/MatchMaker/MatchMaker.csproj
 - name: scoreboard

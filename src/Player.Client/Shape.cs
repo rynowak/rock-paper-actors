@@ -1,4 +1,4 @@
-namespace GameMaster
+namespace Player
 {
     public enum Shape
     {

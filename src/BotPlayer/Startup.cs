@@ -30,8 +30,6 @@ namespace BotPlayer
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 });
             });
-            
-            services.AddSingleton<GameClient>();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
             {
@@ -47,30 +45,11 @@ namespace BotPlayer
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCloudEvents();
-
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHealthChecks("/healthz");
-                endpoints.MapSubscribeHandler();
-
-                var random = new Random();
-                endpoints.MapPost("/bot-game-starting", async context =>
-                {
-                    var gameClient = context.RequestServices.GetRequiredService<GameClient>();
-
-                    var game = await JsonSerializer.DeserializeAsync<GameInfo>(context.Request.Body, options: options);
-                    logger.LogInformation("Joined game {GameId}.", game.GameId);
-
-                    // There's no need to observe the results of the game, just make a move.
-                    var shape = (Shape)random.Next(3);
-
-                    logger.LogInformation("Playing {Shape} in {GameId} against opponent {OpponentUserName}.", shape, game.GameId, game.Opponent.Username);
-                    await gameClient.PlayAsync(game, shape);
-                })
-                .WithMetadata(new TopicAttribute("pubsub", "bot-game-starting"));
             });
         }
     }

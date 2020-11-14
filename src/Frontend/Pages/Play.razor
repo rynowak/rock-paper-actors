@@ -1,5 +1,4 @@
 @page "/play"
-@inject GameClient GameClient
 @inject GameStateService GameStateService
 @inject NavigationManager Navigation
 @implements IDisposable
@@ -27,11 +26,11 @@ else if (move != null && opponentMove is null)
 }
 else
 {
-    if (result.IsDraw.Value)
+    if (result.Outcome == GameOutcome.Draw)
     {
         <p>It's a draw!</p>
     }
-    else if (result.IsVictory(user).Value)
+    else if (result.Outcome == GameOutcome.Win)
     {
         <p>You win!</p>
     }
@@ -96,14 +95,15 @@ else
             move = shape;
 
             await Task.Delay(TimeSpan.FromMilliseconds(750));
-            
+
             var completion = GameStateService.GetCompletedGameAsync(Game.GameId, cts.Token);
-            await GameClient.PlayAsync(Game, shape, cts.Token);
+            var proxy = ActorProxy.Create<IHumanPlayerActor>(new ActorId(user.Username), "HumanPlayerActor");
+            await proxy.PlayMoveAsync(shape);
             result = await completion;
 
-            opponentMove = result.GetOpponentMove(user).Move;
-            moveClass = result.IsDraw.Value ? "btn-warning" : result.IsVictory(user).Value ? "btn-success" : "btn-danger";
-            opponentMoveClass = result.IsDraw.Value ? "btn-warning" : !result.IsVictory(user).Value  ? "btn-success" : "btn-danger";
+            opponentMove = result.Moves[result.Info.Opponent.Username];
+            moveClass = result.Outcome == GameOutcome.Draw ? "btn-warning" : result.Outcome == GameOutcome.Win ? "btn-success" : "btn-danger";
+            opponentMoveClass = result.Outcome == GameOutcome.Draw ? "btn-warning" : result.Outcome == GameOutcome.Loss  ? "btn-success" : "btn-danger";
         }
     }
 

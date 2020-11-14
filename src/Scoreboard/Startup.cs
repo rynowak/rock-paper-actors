@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Player;
 
 namespace Scoreboard
 {
@@ -78,37 +79,34 @@ namespace Scoreboard
                     var stateClient = context.RequestServices.GetRequiredService<DaprClient>();
 
                     var game = await JsonSerializer.DeserializeAsync<GameResult>(context.Request.Body, options: options);
-                    logger.LogInformation("Processing results of game {GameId}.", game.GameId);
+                    logger.LogInformation("Processing results of game {GameId}.", game.Info.GameId);
+
+                    var player = game.Info.Player;
+                    if (player.IsBot)
+                    {
+                        return;
+                    }
 
                     var records = await stateClient.GetStateEntryAsync<Dictionary<string, PlayerRecord>>("statestore", "records");
                     records.Value ??= new Dictionary<string, PlayerRecord>();
 
-                    for (var i = 0; i < game.Players.Length; i++)
+                    if (!records.Value.TryGetValue(player.Username, out var record))
                     {
-                        var player = game.Players[i];
-                        if (player.IsBot)
-                        {
-                            continue;
-                        }
+                        record = new PlayerRecord() { Username = player.Username, };
+                        records.Value.Add(player.Username, record);
+                    }
 
-                        if (!records.Value.TryGetValue(player.Username, out var record))
-                        {
-                            record = new PlayerRecord() { Username = player.Username, };
-                            records.Value.Add(player.Username, record);
-                        }
-
-                        if (game.IsDraw == true)
-                        {
-                            record.Draws++;
-                        }
-                        else if (game.IsVictory(player) == true)
-                        {
-                            record.Wins++;
-                        }
-                        else
-                        {
-                            record.Losses++;
-                        }
+                    if (game.Outcome == GameOutcome.Draw)
+                    {
+                        record.Draws++;
+                    }
+                    else if (game.Outcome == GameOutcome.Win)
+                    {
+                        record.Wins++;
+                    }
+                    else
+                    {
+                        record.Losses++;
                     }
 
                     await records.SaveAsync();

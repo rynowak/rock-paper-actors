@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System.Linq;
+using Dapr.Actors;
+using Player;
 
 namespace GameMaster
 {
@@ -7,16 +9,42 @@ namespace GameMaster
     {
         public string GameId { get; set; }
 
-        public UserInfo[] Players { get; set; }
+        public PlayerInfo[] Players { get; set; }
 
-        public List<PlayerMove> Moves { get; set; }
+        public Dictionary<string, Shape?> Moves { get; set; }
 
-        public UserInfo Winner { get; set; }
+        public string Winner { get; set; }
 
-        [JsonIgnore]
-        public bool IsComplete => Moves?.Count == 2;
+        public IEnumerable<(PlayerInfo player, GameResult result)> GetViews()
+        {
+            foreach (var (player, opponent) in new[]{ (Players[0], Players[1]), (Players[1], Players[0])})
+            {
+                var outcome = (GameOutcome?)GameOutcome.Draw;
+                if (Moves.Any(kvp => kvp.Value == null))
+                {
+                    outcome = null;
+                }
+                else
+                {
+                    outcome = player.Username == Winner ? GameOutcome.Win : GameOutcome.Loss;
+                }
 
-        [JsonIgnore]
-        public bool? IsDraw => IsComplete ? Winner == null : (bool?)null;
+                yield return (player, new GameResult()
+                {
+                    Info = new GameInfo()
+                    {
+                        Game = new ActorReference()
+                        {
+                            ActorId = new ActorId(GameId),
+                            ActorType = "GameActor",
+                        },
+                        Player = player,
+                        Opponent = opponent,
+                    },
+                    Moves = Moves,
+                    Outcome = outcome,
+                });
+            }
+        }
     }
 }

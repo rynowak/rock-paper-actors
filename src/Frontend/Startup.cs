@@ -53,8 +53,6 @@ namespace Frontend
             services.AddScoped<GameService>();
             services.AddSingleton<GameStateService>();
             
-            services.AddScoped<GameClient>();
-            services.AddScoped<MatchMakerClient>();
             services.AddScoped<ScoreboardClient>();
 
             services.AddSingleton<JsonSerializerOptions>(new JsonSerializerOptions()
